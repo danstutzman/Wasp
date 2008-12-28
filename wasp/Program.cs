@@ -9,26 +9,20 @@ namespace Wasp {
             program.execute();
         }
 
-        private ApplicationContext appCtx;
-
         public void execute() {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            this.appCtx = new ApplicationContext();
+            ApplicationContext appCtx = new ApplicationContext();
 
-            TopForm form = new TopForm();
-            form.Visible = false;
-            form.HandleDestroyed += new EventHandler(CustomHandleDestroyed);
-            ApplicationDesktopToolbar toolbar = new ApplicationDesktopToolbar(
-                form, ApplicationDesktopToolbar.AppBarEdges.Top);
-            toolbar.AutoHide = true;
+            TopModel model = new TopModel();
+            TopController topController = new TopController(model);
+            topController.FormDestroyed += delegate(Object sender, EventArgs args) {
+                appCtx.ExitThread();
+            };
+            topController.Show();
 
-            Application.Run(this.appCtx);
+            Application.Run(appCtx);
         }
-
-        private void CustomHandleDestroyed(Object sender, EventArgs e) {
-            this.appCtx.ExitThread();
-        }
-    }
+     }
 }
