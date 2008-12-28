@@ -48,6 +48,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplicationDesktopToolbar.cs" />
+    <Compile Include="ShellApi.cs" />
     <Compile Include="TopForm.cs">
       <SubType>Form</SubType>
     </Compile>
