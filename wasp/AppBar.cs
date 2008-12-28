@@ -129,12 +129,14 @@ namespace Wasp {
         #endregion Enums
 
         private bool autoHide;
+        private bool keepOpen;
         private AppBarEdges _Edge = AppBarEdges.Top;
         private Form form;
         private UInt32 callbackMessageID;
-        private Form _EdgeForm;
+        private Form edgeForm;
         private ShellApi.RECT formSize;
         private ShellApi.RECT edgeFormSize;
+        private Timer timer; // hide form once mouse leaves for 500 ms
 
         public AppBar(Form form, bool autoHide) {
             this.form = form;
@@ -150,17 +152,17 @@ namespace Wasp {
             this.formSize = PickAppropriateSize();
             this.edgeFormSize = GenerateRECTForEdgeForm(1);
 
-            _EdgeForm = new Form();
-            _EdgeForm.TopMost = true;
-            _EdgeForm.FormBorderStyle = FormBorderStyle.None;
-            _EdgeForm.ShowInTaskbar = false;
-            _EdgeForm.MouseEnter += new EventHandler(UnhideAppbar);
-            _EdgeForm.MouseHover += new EventHandler(UnhideAppbar);
-            _EdgeForm.MouseMove += new MouseEventHandler(UnhideAppbar);
+            this.edgeForm = new Form();
+            this.edgeForm.TopMost = true;
+            this.edgeForm.FormBorderStyle = FormBorderStyle.None;
+            this.edgeForm.ShowInTaskbar = false;
+            this.edgeForm.MouseEnter += new EventHandler(UnhideAppbar);
+            this.edgeForm.MouseHover += new EventHandler(UnhideAppbar);
+            this.edgeForm.MouseMove += new MouseEventHandler(UnhideAppbar);
 
-            Timer = new Timer();
-            Timer.Tick += new EventHandler(Timer_Tick);
-            Timer.Interval = 500;
+            this.timer = new Timer();
+            this.timer.Tick += new EventHandler(Timer_Tick);
+            this.timer.Interval = 500;
 
             this.MakeNew();
         }
@@ -175,19 +177,34 @@ namespace Wasp {
                         ResizeAppBar(ref this.formSize);
                         //this._EdgeForm.Close();
                         //this._EdgeForm = null;
-                        this._EdgeForm.Visible = false;
+                        this.edgeForm.Visible = false;
                         this.form.Visible = true;
-                        Timer.Stop();
+                        timer.Stop();
                     }));
                 }
                 else if (!this.autoHide && !value) {
                     this.form.BeginInvoke(new MethodInvoker(delegate() {
                         this.autoHide = true;
                         this.Show();
-                        Timer.Start();
+                        if (!this.keepOpen)
+                            timer.Start();
                     }));
                 }
                 this.autoHide = !value;
+            }
+        }
+
+        public bool KeepOpen {
+            set {
+                if (this.autoHide) {
+                    if (value) {
+                        timer.Stop();
+                        UnhideAppbar();
+                    }
+                    else
+                        timer.Start();
+                }
+                this.keepOpen = value;
             }
         }
 
@@ -204,15 +221,15 @@ namespace Wasp {
                 AppbarSetPos(ref edgeFormSize);
                 Application.DoEvents();
 
-                _EdgeForm.Show();
-                _EdgeForm.Focus();
+                edgeForm.Show();
+                edgeForm.Focus();
 
                 // Keep Bill Gates Happy
                 Application.DoEvents();
 
                 // Set up location of EdgeForm
-                _EdgeForm.LocationChanged += new EventHandler(_EdgeForm_FixLocationAndSize);
-                _EdgeForm.SizeChanged += new EventHandler(_EdgeForm_FixLocationAndSize);
+                edgeForm.LocationChanged += new EventHandler(_EdgeForm_FixLocationAndSize);
+                edgeForm.SizeChanged += new EventHandler(_EdgeForm_FixLocationAndSize);
                 _EdgeForm_FixLocationAndSize(this, new EventArgs());
 
                 //Form.MouseLeave += new EventHandler(Form_MouseLeave);
@@ -369,8 +386,8 @@ namespace Wasp {
         /// Handles sizing for the edge form used during autohide
         void _EdgeForm_FixLocationAndSize(object sender, EventArgs e) {
             ShellApi.RECT edgeFormSize = GenerateRECTForEdgeForm(0);
-            _EdgeForm.Location = new Point(edgeFormSize.Left, edgeFormSize.Top);
-            _EdgeForm.Size = new Size(edgeFormSize.Right - edgeFormSize.Left, edgeFormSize.Bottom - edgeFormSize.Top);
+            edgeForm.Location = new Point(edgeFormSize.Left, edgeFormSize.Top);
+            edgeForm.Size = new Size(edgeFormSize.Right - edgeFormSize.Left, edgeFormSize.Bottom - edgeFormSize.Top);
         }
 
         /// Displays the docked AppBar when AutoHide is on
@@ -380,20 +397,21 @@ namespace Wasp {
 
         /// Displays the docked AppBar when AutoHide is on
         void UnhideAppbar() {
-            _EdgeForm.Hide();
+            edgeForm.Hide();
             Application.DoEvents();
             this.form.Visible = true;
             this.form.BringToFront();
             this.form.Focus();
-            Timer.Start();
+            if (!this.keepOpen)
+                timer.Start();
         }
 
         void Timer_Tick(object sender, EventArgs e) {
-            // Stop watch if the form becomes visible
-            /*if (!AutoHide) {
-                Timer.Stop();
+            // Stop watch if the form becomes visible or supposed to keep it open
+            if (!this.autoHide || this.keepOpen) {
+                this.timer.Stop();
                 return;
-            }*/
+            }
 
             // Do not hide if there is a model form displayed
             if (!this.form.CanFocus) {
@@ -412,12 +430,9 @@ namespace Wasp {
                             return;
 
             this.form.Visible = false;
-            _EdgeForm.TopMost = true;
-            _EdgeForm.Show();
+            edgeForm.TopMost = true;
+            edgeForm.Show();
         }
-
-        /// Timer used to watch the mouse when the hidden form is displayed
-        private Timer Timer;
 
         /// Displays the docked AppBar when AutoHide is on
         void UnhideAppbar(object sender, MouseEventArgs e) {
