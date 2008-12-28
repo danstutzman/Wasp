@@ -31,6 +31,7 @@
             this.exitButton = new System.Windows.Forms.Button();
             this.pinCheckBox = new System.Windows.Forms.CheckBox();
             this.snoozeButton = new System.Windows.Forms.Button();
+            this.timeLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // exitButton
@@ -62,11 +63,21 @@
             this.snoozeButton.Text = "Snooze";
             this.snoozeButton.UseVisualStyleBackColor = true;
             // 
+            // timeLabel
+            // 
+            this.timeLabel.AutoSize = true;
+            this.timeLabel.Location = new System.Drawing.Point(40, 13);
+            this.timeLabel.Name = "timeLabel";
+            this.timeLabel.Size = new System.Drawing.Size(49, 13);
+            this.timeLabel.TabIndex = 3;
+            this.timeLabel.Text = "88:88:88";
+            // 
             // TopForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(500, 50);
+            this.Controls.Add(this.timeLabel);
             this.Controls.Add(this.snoozeButton);
             this.Controls.Add(this.pinCheckBox);
             this.Controls.Add(this.exitButton);
@@ -85,6 +96,7 @@
         public System.Windows.Forms.Button exitButton;
         public System.Windows.Forms.CheckBox pinCheckBox;
         public System.Windows.Forms.Button snoozeButton;
+        public System.Windows.Forms.Label timeLabel;
 
     }
 }

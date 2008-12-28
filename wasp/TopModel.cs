@@ -11,17 +11,24 @@ namespace Wasp {
 
         public event EventHandler PinnedChange;
         public event EventHandler AlarmChange;
+        public event EventHandler ClockTick;
 
         public TopModel() {
             //this.pinned = true;
+            this.time = DateTime.Now.ToLongTimeString();
         }
 
         public void InitTimer() {
-            ScheduleTimer timer = new ScheduleTimer();
-            DateTime time = new DateTime(2008, 12, 28, 15, 42, 30);
-            timer.AddJob(new TimerJob(new SingleEvent(time),
-                new DelegateMethodCall(new NoArgsDelegate(Tick))));
-            timer.Start();
+            ScheduleTimer alarm = new ScheduleTimer();
+            DateTime alarmTime = new DateTime(2008, 12, 28, 15, 42, 30);
+            alarm.AddJob(new TimerJob(new SingleEvent(alarmTime),
+                new DelegateMethodCall(new NoArgsDelegate(TriggerAlarm))));
+            alarm.Start();
+
+            Timer clock = new Timer();
+            clock.Interval = 1000;
+            clock.Tick += Tick;
+            clock.Start();
         }
 
         private bool pinned;
@@ -34,18 +41,24 @@ namespace Wasp {
         }
 
         private bool alarmed;
-        public bool Alarmed {
-            get { return this.alarmed; }
-        }
+        public bool Alarmed { get { return this.alarmed; } }
+
+        private String time;
+        public String Time { get { return this.time; } }
 
         public void SnoozeAlarm() {
             this.alarmed = false;
             this.AlarmChange(this, new EventArgs());
         }
 
-        public void Tick() {
+        private void TriggerAlarm() {
             this.alarmed = true;
             this.AlarmChange(this, new EventArgs());
+        }
+
+        private void Tick(Object sender, EventArgs e) {
+            this.time = DateTime.Now.ToLongTimeString();
+            this.ClockTick(this, new EventArgs());
         }
     }
 }

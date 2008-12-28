@@ -38,9 +38,12 @@ namespace Wasp {
             };
             this.form.snoozeButton.Enabled = this.model.Alarmed;
 
+            this.form.timeLabel.Text = this.model.Time;
+
             this.appBar = new AppBar(this.form, !this.model.Pinned);
             this.model.PinnedChange += OnModelPinnedChange;
             this.model.AlarmChange += OnModelAlarmChange;
+            this.model.ClockTick += OnClockTick;
 
             this.backgroundIsRed = false;
             this.flashTimer = new Timer();
@@ -70,6 +73,12 @@ namespace Wasp {
                     this.form.BackColor = System.Drawing.SystemColors.Control;
                     this.form.snoozeButton.Enabled = false;
                 }
+            }));
+        }
+        
+        private void OnClockTick(Object sender, EventArgs e) {
+            this.form.BeginInvoke(new MethodInvoker(delegate() {
+                this.form.timeLabel.Text = this.model.Time;
             }));
         }
 
