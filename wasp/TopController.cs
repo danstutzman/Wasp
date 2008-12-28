@@ -39,10 +39,26 @@ namespace Wasp {
             this.form.snoozeButton.Enabled = this.model.Alarmed;
 
             this.appBar = new AppBar(this.form, !this.model.Pinned);
-            this.model.PinnedChange += delegate(Object sender, EventArgs e) {
+            this.model.PinnedChange += OnModelPinnedChange;
+            this.model.AlarmChange += OnModelAlarmChange;
+
+            this.backgroundIsRed = false;
+            this.flashTimer = new Timer();
+            this.flashTimer.Tick += FlashBackground;
+        }
+
+        public void Show() {
+            this.appBar.Show();
+        }
+
+        private void OnModelPinnedChange(Object sender, EventArgs e) {
+            this.form.BeginInvoke(new MethodInvoker(delegate() {
                 this.appBar.Pinned = this.model.Pinned;
-            };
-            this.model.AlarmChange += delegate(Object sender, EventArgs e) {
+            }));
+        }
+
+        private void OnModelAlarmChange(Object sender, EventArgs e) {
+            this.form.BeginInvoke(new MethodInvoker(delegate() {
                 if (this.model.Alarmed) {
                     this.flashTimer.Start();
                     this.appBar.KeepOpen = true;
@@ -54,15 +70,7 @@ namespace Wasp {
                     this.form.BackColor = System.Drawing.SystemColors.Control;
                     this.form.snoozeButton.Enabled = false;
                 }
-            };
-
-            this.backgroundIsRed = false;
-            this.flashTimer = new Timer();
-            this.flashTimer.Tick += FlashBackground;
-        }
-
-        public void Show() {
-            this.appBar.Show();
+            }));
         }
 
         private void FlashBackground(Object sender, EventArgs e) {

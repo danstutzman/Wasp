@@ -65,6 +65,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppBar.cs" />
+    <Compile Include="ScheduleTimer\BlockWrapper.cs" />
+    <Compile Include="ScheduleTimer\EventInstance.cs" />
+    <Compile Include="ScheduleTimer\EventQueue.cs" />
+    <Compile Include="ScheduleTimer\EventStorage.cs" />
+    <Compile Include="ScheduleTimer\IScheduledItem.cs" />
+    <Compile Include="ScheduleTimer\MethodCall.cs" />
+    <Compile Include="ScheduleTimer\ReportTimer.cs" />
+    <Compile Include="ScheduleTimer\ScheduledTime.cs" />
+    <Compile Include="ScheduleTimer\ScheduleFilter.cs" />
+    <Compile Include="ScheduleTimer\ScheduleTimer.cs" />
+    <Compile Include="ScheduleTimer\SimpleInterval.cs" />
+    <Compile Include="ScheduleTimer\SingleEvent.cs" />
+    <Compile Include="ScheduleTimer\TimerJob.cs" />
+    <Compile Include="ScheduleTimer\WindowWrapper.cs" />
     <Compile Include="TopModel.cs" />
     <Compile Include="ShellApi.cs" />
     <Compile Include="TopController.cs" />

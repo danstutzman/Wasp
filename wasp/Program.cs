@@ -25,5 +25,5 @@ namespace Wasp {
 
             Application.Run(appCtx);
         }
-     }
+    }
 }
