@@ -25,12 +25,15 @@ namespace Wasp {
             this.form.exitButton.Click += delegate(Object sender, EventArgs e) {
                 this.form.Close();
             };
-            this.form.pinButton.Click += delegate(Object sender, EventArgs e) {
-                this.Pinned = !this.Pinned;
+                this.form.pinCheckBox.CheckState = CheckState.Checked;
+            this.form.pinCheckBox.CheckedChanged += delegate(Object sender, EventArgs e) {
+                this.model.Pinned = this.form.pinCheckBox.Checked;
             };
 
-            Boolean autoHide = false;
-            this.appBar = new AppBar(this.form, autoHide);
+            this.appBar = new AppBar(this.form, this.model.Pinned);
+            this.model.PinnedChange += delegate(Object sender, EventArgs e) {
+                this.appBar.Pinned = this.model.Pinned;
+            };
         }
 
         public void Show() {
@@ -41,11 +44,6 @@ namespace Wasp {
         public void Dispose() {
             //AutoHide = false;
             this.appBar.Hide();
-        }
-
-        public bool Pinned {
-            get { return this.appBar.Pinned; }
-            set { this.appBar.Pinned = value; }
         }
     }
 }

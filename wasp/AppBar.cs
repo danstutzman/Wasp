@@ -169,19 +169,23 @@ namespace Wasp {
             get { return !this.autoHide; }
             set {
                 if (this.autoHide && value) {
-                    AppbarSetAutoHideBar(false);
-                    SizeAppBar(ref this.formSize);
-                    ResizeAppBar(ref this.formSize);
-                    //this._EdgeForm.Close();
-                    //this._EdgeForm = null;
-                    this._EdgeForm.Visible = false;
-                    this.form.Visible = true;
-                    Timer.Stop();
+                    this.form.BeginInvoke(new MethodInvoker(delegate() {
+                        AppbarSetAutoHideBar(false);
+                        SizeAppBar(ref this.formSize);
+                        ResizeAppBar(ref this.formSize);
+                        //this._EdgeForm.Close();
+                        //this._EdgeForm = null;
+                        this._EdgeForm.Visible = false;
+                        this.form.Visible = true;
+                        Timer.Stop();
+                    }));
                 }
                 else if (!this.autoHide && !value) {
-                    this.autoHide = true;
-                    this.Show();
-                    Timer.Start();
+                    this.form.BeginInvoke(new MethodInvoker(delegate() {
+                        this.autoHide = true;
+                        this.Show();
+                        Timer.Start();
+                    }));
                 }
                 this.autoHide = !value;
             }

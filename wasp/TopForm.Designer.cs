@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.exitButton = new System.Windows.Forms.Button();
-            this.pinButton = new System.Windows.Forms.Button();
+            this.pinCheckBox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // exitButton
@@ -41,21 +41,23 @@
             this.exitButton.Text = "Exit";
             this.exitButton.UseVisualStyleBackColor = true;
             // 
-            // pinButton
+            // pinCheckBox
             // 
-            this.pinButton.Location = new System.Drawing.Point(195, 13);
-            this.pinButton.Name = "pinButton";
-            this.pinButton.Size = new System.Drawing.Size(95, 24);
-            this.pinButton.TabIndex = 1;
-            this.pinButton.Text = "Pin";
-            this.pinButton.UseVisualStyleBackColor = true;
+            this.pinCheckBox.Appearance = System.Windows.Forms.Appearance.Button;
+            this.pinCheckBox.AutoSize = true;
+            this.pinCheckBox.Location = new System.Drawing.Point(186, 12);
+            this.pinCheckBox.Name = "pinCheckBox";
+            this.pinCheckBox.Size = new System.Drawing.Size(32, 23);
+            this.pinCheckBox.TabIndex = 1;
+            this.pinCheckBox.Text = "Pin";
+            this.pinCheckBox.UseVisualStyleBackColor = true;
             // 
             // TopForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(500, 50);
-            this.Controls.Add(this.pinButton);
+            this.Controls.Add(this.pinCheckBox);
             this.Controls.Add(this.exitButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "TopForm";
@@ -63,13 +65,14 @@
             this.Text = "TopForm";
             this.TopMost = true;
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
         public System.Windows.Forms.Button exitButton;
-        public System.Windows.Forms.Button pinButton;
+        public System.Windows.Forms.CheckBox pinCheckBox;
 
     }
 }

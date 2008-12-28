@@ -65,7 +65,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppBar.cs" />
-    <Compile Include="ApplicationDesktopToolbar.cs" />
     <Compile Include="TopModel.cs" />
     <Compile Include="ShellApi.cs" />
     <Compile Include="TopController.cs" />
