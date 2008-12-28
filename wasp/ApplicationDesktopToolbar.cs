@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace WindowsFormsApplication1
+namespace Wasp
 {
     public class ApplicationDesktopToolbar : IDisposable
     {

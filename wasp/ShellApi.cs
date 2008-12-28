@@ -2,7 +2,7 @@
 using System.Text;
 using System.Runtime.InteropServices;
 
-namespace WindowsFormsApplication1
+namespace Wasp
 {
     public class ShellApi
     {
