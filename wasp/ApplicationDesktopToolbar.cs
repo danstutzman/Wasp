@@ -6,111 +6,84 @@ using System.Windows.Forms;
 
 namespace Wasp
 {
-    public class ApplicationDesktopToolbar : IDisposable
-    {
-        /// 
-        /// The form that is going to be turned into an appbar
-        /// 
+    public class ApplicationDesktopToolbar : IDisposable {
         private Form Form;
 
         #region Enums
-        public enum AppBarMessages
-        {
-            /// 
+        public enum AppBarMessages {
             /// Registers a new appbar and specifies the message identifier
             /// that the system should use to send notification messages to 
             /// the appbar. 
-            /// 
             New = 0x00000000,
-            /// 
+
             /// Unregisters an appbar, removing the bar from the system's 
             /// internal list.
-            /// 
             Remove = 0x00000001,
-            /// 
+
             /// Requests a size and screen position for an appbar.
-            /// 
             QueryPos = 0x00000002,
-            /// 
+
             /// Sets the size and screen position of an appbar. 
-            /// 
             SetPos = 0x00000003,
-            /// 
-            /// Retrieves the autohide and always-on-top states of the 
-            /// MicrosoftÂ® WindowsÂ® taskbar. 
-            /// 
+
+            /// Retrieves the autohide and always-on-top states of the
+            /// Windows taskbar. 
             GetState = 0x00000004,
-            /// 
+
             /// Retrieves the bounding rectangle of the Windows taskbar. 
-            /// 
             GetTaskBarPos = 0x00000005,
-            /// 
+
             /// Notifies the system that an appbar has been activated. 
-            /// 
             Activate = 0x00000006,
-            /// 
+
             /// Retrieves the handle to the autohide appbar associated with
             /// a particular edge of the screen. 
-            /// 
             GetAutoHideBar = 0x00000007,
-            /// 
+
             /// Registers or unregisters an autohide appbar for an edge of 
             /// the screen. 
-            /// 
             SetAutoHideBar = 0x00000008,
-            /// 
+
             /// Notifies the system when an appbar's position has changed. 
-            /// 
             WindowPosChanged = 0x00000009,
-            /// 
+
             /// Sets the state of the appbar's autohide and always-on-top 
             /// attributes.
-            /// 
             SetState = 0x0000000a
         }
 
-
-        public enum AppBarNotifications
-        {
-            /// 
+        public enum AppBarNotifications {
             /// Notifies an appbar that the taskbar's autohide or 
-            /// always-on-top state has changedâ€”that is, the user has selected 
+            /// always-on-top state has change - that is, the user has selected 
             /// or cleared the "Always on top" or "Auto hide" check box on the
             /// taskbar's property sheet. 
-            /// 
             StateChange = 0x00000000,
-            /// 
+
             /// Notifies an appbar when an event has occurred that may affect 
             /// the appbar's size and position. Events include changes in the
             /// taskbar's size, position, and visibility state, as well as the
             /// addition, removal, or resizing of another appbar on the same 
             /// side of the screen.
-            /// 
             PosChanged = 0x00000001,
-            /// 
+
             /// Notifies an appbar when a full-screen application is opening or
             /// closing. This notification is sent in the form of an 
             /// application-defined message that is set by the ABM_NEW message. 
-            /// 
             FullScreenApp = 0x00000002,
-            /// 
+
             /// Notifies an appbar that the user has selected the Cascade, 
             /// Tile Horizontally, or Tile Vertically command from the 
             /// taskbar's shortcut menu.
-            /// 
             WindowArrange = 0x00000003
         }
 
         [Flags]
-        public enum AppBarStates
-        {
+        public enum AppBarStates {
             AutoHide = 0x00000001,
             AlwaysOnTop = 0x00000002
         }
 
-
-        public enum AppBarEdges
-        {
+        public enum AppBarEdges {
             Left = 0,
             Top = 1,
             Right = 2,
@@ -118,15 +91,13 @@ namespace Wasp
         }
 
         // Window Messages	
-        public enum WM
-        {
+        public enum WM {
             ACTIVATE = 0x0006,
             WINDOWPOSCHANGED = 0x0047,
             NCHITTEST = 0x0084
         }
 
-        public enum MousePositionCodes
-        {
+        public enum MousePositionCodes {
             HTERROR = (-2),
             HTTRANSPARENT = (-1),
             HTNOWHERE = 0,
@@ -162,112 +133,75 @@ namespace Wasp
 
         #region AppBar Functions
 
-        private Boolean AppbarNew()
-        {
+        private Boolean AppbarNew() {
             if (CallbackMessageID == 0)
                 throw new Exception("CallbackMessageID is 0");
 
-            if (IsAppbarMode)
-            {
+            if (IsAppbarMode) {
                 return true;
             }
 
-            // prepare data structure of message
             ShellApi.APPBARDATA msgData = new ShellApi.APPBARDATA();
             msgData.cbSize = (UInt32)Marshal.SizeOf(msgData);
             msgData.hWnd = Form.Handle;
             msgData.uCallbackMessage = CallbackMessageID;
-
-            // install new appbar
             UInt32 retVal = ShellApi.SHAppBarMessage((UInt32)AppBarMessages.New, ref msgData);
             IsAppbarMode = (retVal != 0);
-
             SizeAppBar();
-
             return IsAppbarMode;
         }
 
-        private Boolean AppbarRemove()
-        {
-            // prepare data structure of message
+        private Boolean AppbarRemove() {
             ShellApi.APPBARDATA msgData = new ShellApi.APPBARDATA();
             msgData.cbSize = (UInt32)Marshal.SizeOf(msgData);
             msgData.hWnd = Form.Handle;
-
-            // remove appbar
             UInt32 retVal = ShellApi.SHAppBarMessage((UInt32)AppBarMessages.Remove, ref msgData);
-
             IsAppbarMode = false;
-
             return (retVal != 0) ? true : false;
         }
 
-        /// 
         /// Passes a proposed AppBar location to the OS to verify that it's ok to set
-        /// 
-        /// 
-        private void AppbarQueryPos(ref ShellApi.RECT appRect)
-        {
-            // prepare data structure of message
+        private void AppbarQueryPos(ref ShellApi.RECT appRect) {
             ShellApi.APPBARDATA msgData = new ShellApi.APPBARDATA();
             msgData.cbSize = (UInt32)Marshal.SizeOf(msgData);
             msgData.hWnd = Form.Handle;
             msgData.uEdge = (UInt32)_Edge;
             msgData.rc = appRect;
-
-            // query postion for the appbar
             ShellApi.SHAppBarMessage((UInt32)AppBarMessages.QueryPos, ref msgData);
             appRect = msgData.rc;
         }
 
-        private void AppbarSetPos(ref ShellApi.RECT appRect)
-        {
-            // prepare data structure of message
+        private void AppbarSetPos(ref ShellApi.RECT appRect) {
             ShellApi.APPBARDATA msgData = new ShellApi.APPBARDATA();
             msgData.cbSize = (UInt32)Marshal.SizeOf(msgData);
             msgData.hWnd = Form.Handle;
             msgData.uEdge = (UInt32)_Edge;
             msgData.rc = appRect;
-
-            // set postion for the appbar
             ShellApi.SHAppBarMessage((UInt32)AppBarMessages.SetPos, ref msgData);
             appRect = msgData.rc;
         }
 
-        private void AppbarActivate()
-        {
-            // prepare data structure of message
+        private void AppbarActivate() {
             ShellApi.APPBARDATA msgData = new ShellApi.APPBARDATA();
             msgData.cbSize = (UInt32)Marshal.SizeOf(msgData);
             msgData.hWnd = Form.Handle;
-
-            // send activate to the system
             ShellApi.SHAppBarMessage((UInt32)AppBarMessages.Activate, ref msgData);
-            Console.Error.WriteLine("activate new app rect");
         }
 
-        protected Boolean AppbarSetAutoHideBar(Boolean hideValue)
-        {
-            // prepare data structure of message
+        protected Boolean AppbarSetAutoHideBar(Boolean hideValue) {
             ShellApi.APPBARDATA msgData = new ShellApi.APPBARDATA();
             msgData.cbSize = (UInt32)Marshal.SizeOf(msgData);
             msgData.hWnd = Form.Handle;
             msgData.uEdge = (UInt32)_Edge;
             msgData.lParam = (hideValue) ? 1 : 0;
-
-            // set auto hide
             UInt32 retVal = ShellApi.SHAppBarMessage((UInt32)AppBarMessages.SetAutoHideBar, ref msgData);
             return (retVal != 0) ? true : false;
         }
 
-        private IntPtr AppbarGetAutoHideBar(AppBarEdges edge)
-        {
-            // prepare data structure of message
+        private IntPtr AppbarGetAutoHideBar(AppBarEdges edge) {
             ShellApi.APPBARDATA msgData = new ShellApi.APPBARDATA();
             msgData.cbSize = (UInt32)Marshal.SizeOf(msgData);
             msgData.uEdge = (UInt32)edge;
-
-            // get auto hide
             IntPtr retVal = (IntPtr)ShellApi.SHAppBarMessage((UInt32)AppBarMessages.GetAutoHideBar, ref msgData);
             return retVal;
         }
@@ -276,32 +210,20 @@ namespace Wasp
 
         #region Private Variables
 
-        /// 
-        /// saves the callback message id
-        /// 
         private UInt32 CallbackMessageID = 0;
 
-        /// 
-        /// are we in dock mode?
-        /// 
         private Boolean IsAppbarMode = false;
 
         #endregion Private Variables
 
-        /// 
-        /// Turns the form into an AppBar on the given edge. It is up to you to make sure that the form can not be moved or resized
-        /// 
-        /// 
-        /// 
-        public ApplicationDesktopToolbar(Form form, AppBarEdges edge)
-        {
+        /// Turns the form into an AppBar on the given edge.
+        /// It is up to you to make sure that the form can not be moved or resized
+        public ApplicationDesktopToolbar(Form form, AppBarEdges edge) {
             Form = form;
 
             // Make sure that this form can be an appbar
-
             if (Form.FormBorderStyle != FormBorderStyle.None)
                 throw new Exception("Only forms with a FormBorderStyle of None are supported as an ApplicationDesktopToolbar. This is because the system does not support resizable and draggable AppBars");
-
             if (Form.TopMost == false)
                 throw new Exception("An AppBar must be topmost to work properly");
 
@@ -320,45 +242,35 @@ namespace Wasp
             Timer.Interval = 500;
         }
 
-        private UInt32 RegisterCallbackMessage()
-        {
+        private UInt32 RegisterCallbackMessage() {
             String uniqueMessageString = Guid.NewGuid().ToString();
             return ShellApi.RegisterWindowMessage(uniqueMessageString);
         }
 
-        /// 
-        /// This registers the AppBar with the OS and sets its appropriate size
-        /// 
+        /// Register the AppBar with the OS and sets its appropriate size
         private void SizeAppBar()
         {
             ShellApi.RECT rt = new ShellApi.RECT();
 
-            if ((_Edge == AppBarEdges.Left) ||
-            (_Edge == AppBarEdges.Right))
-            {
+            if ((_Edge == AppBarEdges.Left) || (_Edge == AppBarEdges.Right)) {
                 rt.Top = 0;
                 rt.Bottom = SystemInformation.PrimaryMonitorSize.Height;
-                if (_Edge == AppBarEdges.Left)
-                {
+                if (_Edge == AppBarEdges.Left) {
                     rt.Right = Form.Width;
                     rt.Left = 0;
                 }
-                else
-                {
+                else {
                     rt.Right = SystemInformation.PrimaryMonitorSize.Width;
                     rt.Left = rt.Right - Form.Width;
                 }
             }
-            else
-            {
+            else {
                 rt.Left = 0;
                 rt.Right = SystemInformation.PrimaryMonitorSize.Width;
-                if (_Edge == AppBarEdges.Top)
-                {
+                if (_Edge == AppBarEdges.Top) {
                     rt.Bottom = Form.Height;
                 }
-                else
-                {
+                else {
                     rt.Bottom = SystemInformation.PrimaryMonitorSize.Height;
                     rt.Top = rt.Bottom - Form.Height;
                 }
@@ -379,48 +291,31 @@ namespace Wasp
                 Form.Size = desiredSize;
         }
 
-        private void Form_Closing(object sender, CancelEventArgs e)
-        {
+        private void Form_Closing(object sender, CancelEventArgs e) {
             Timer.Stop();
             AppbarRemove();
         }
 
-        /// 
-        /// The edge that the form sits on
-        /// 
-        public AppBarEdges Edge
-        {
-            get { return _Edge; }
-        }
+        public AppBarEdges Edge { get { return _Edge; } }
         private AppBarEdges _Edge;
 
-        /// 
         /// A 1-pixel-wide or 1-pixel-tall form used when the appbar is set to autohide. It makes the edge
         /// sticky so that the appbar is shown when the mouse hits the edge
-        /// 
-        public Form EdgeForm
-        {
-            get { return _EdgeForm; }
-        }
+        public Form EdgeForm { get { return _EdgeForm; } }
         private Form _EdgeForm = null;
 
-        /// 
         /// Gets/Sets the autohide status. Note: When setting AutoHide to true, it's possible for such a
         /// setting to fail if there's already an autohide bar on the edge. In that case, this property will
         /// remain false
-        /// 
-        public bool AutoHide
-        {
+        public bool AutoHide {
             get { return _AutoHide; }
-            set
-            {
+            set {
                 // changing to settings that are already set would f*ck things up!!!
                 if (value == _AutoHide)
                     return;
 
                 // Autohide actions differ based on what we're doing
-                if (value)
-                {
+                if (value) {
                     // We're setting autohide on
 
                     // Let's make sure that there already isn't an existing autohide bar
@@ -442,8 +337,7 @@ namespace Wasp
                     Application.DoEvents();
 
                     // If we can't set the autohide bar, return without changing the setting
-                    if (!AppbarSetAutoHideBar(true))
-                    {
+                    if (!AppbarSetAutoHideBar(true)) {
                         AppbarRemove();
                         AppbarNew();
                         SizeAppBar();
@@ -477,14 +371,12 @@ namespace Wasp
 
                     Form.TopMost = true;
                 }
-                else
-                {
+                else {
                     // Turn autohide bar off
                     AppbarSetAutoHideBar(false);
                     SizeAppBar();
                     EdgeForm.Close();
                     _EdgeForm = null;
-                    //Form.MouseLeave -= new EventHandler(Form_MouseLeave);
                     Form.Visible = true;
                     Timer.Stop();
                 }
@@ -494,15 +386,10 @@ namespace Wasp
         }
         private bool _AutoHide = false;
 
-        /// 
         /// Generates coordinates for the edge form used during autohide
-        /// 
-        /// 
-        private ShellApi.RECT GenerateRECTForEdgeForm(int size)
-        {
+        private ShellApi.RECT GenerateRECTForEdgeForm(int size) {
             // resize appbar
-            switch (_Edge)
-            {
+            switch (_Edge) {
                 case AppBarEdges.Bottom:
                     return new ShellApi.RECT(
                     0,
@@ -536,59 +423,38 @@ namespace Wasp
             }
         }
 
-        /// 
         /// Handles sizing for the edge form used during autohide
-        /// 
-        /// 
-        /// 
-        void _EdgeForm_FixLocationAndSize(object sender, EventArgs e)
-        {
+        void _EdgeForm_FixLocationAndSize(object sender, EventArgs e) {
             ShellApi.RECT edgeFormSize = GenerateRECTForEdgeForm(0);
-
             _EdgeForm.Location = new Point(edgeFormSize.Left, edgeFormSize.Top);
             _EdgeForm.Size = new Size(edgeFormSize.Right - edgeFormSize.Left, edgeFormSize.Bottom - edgeFormSize.Top);
         }
 
-        /// 
         /// Displays the docked AppBar when AutoHide is on
-        /// 
-        /// 
-        /// 
-        void UnhideAppbar(object sender, EventArgs e)
-        {
+        void UnhideAppbar(object sender, EventArgs e) {
             UnhideAppbar();
         }
 
-        /// 
         /// Displays the docked AppBar when AutoHide is on
-        /// 
-        /// 
-        /// 
-        void UnhideAppbar()
-        {
+        void UnhideAppbar() {
             _EdgeForm.Hide();
             Application.DoEvents();
             Form.Visible = true;
             Form.BringToFront();
             Form.Focus();
-
             Timer.Start();
         }
 
         void Timer_Tick(object sender, EventArgs e)
         {
-            //Console.Error.WriteLine("Timer tick");
             // Stop watch if the form becomes visible
-            if (!AutoHide)
-            {
+            if (!AutoHide) {
                 Timer.Stop();
                 return;
             }
 
             // Do not hide if there is a model form displayed
-            if (!Form.CanFocus)
-            {
-                //Console.Error.WriteLine("Don't hide because model form is displayed...?");
+            if (!Form.CanFocus) {
                 return;
             }
 
@@ -608,37 +474,23 @@ namespace Wasp
             _EdgeForm.Show();
         }
 
-        /// 
         /// Timer used to watch the mouse when the hidden form is displayed
-        /// 
         private Timer Timer;
 
-        /// 
         /// Displays the docked AppBar when AutoHide is on
-        /// 
-        /// 
-        /// 
-        void UnhideAppbar(object sender, MouseEventArgs e)
-        {
+        void UnhideAppbar(object sender, MouseEventArgs e) {
             UnhideAppbar();
         }
 
-        /// 
         /// Releases the screen area held by the appBar back to the OS
-        /// 
-        public void Dispose()
-        {
+        public void Dispose() {
             AutoHide = false;
             AppbarRemove();
         }
 
-        /// 
         /// Base class for all exceptions generated by the ApplicationDesktopToolbar
-        /// 
-        public class Exception : System.Exception
-        {
-            internal Exception(string message)
-                : base(message) { }
+        public class Exception : System.Exception {
+            internal Exception(string message) : base(message) { }
         }
     }
 }

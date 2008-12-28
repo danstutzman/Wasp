@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Wasp
-{
-    class Program
-    {
+namespace Wasp {
+    class Program {
         [STAThread]
-        static void Main()
-        {
+        static void Main() {
             Program program = new Program();
             program.execute();
         }
@@ -30,8 +27,7 @@ namespace Wasp
             Application.Run(this.appCtx);
         }
 
-        private void CustomHandleDestroyed(Object sender, EventArgs e)
-        {
+        private void CustomHandleDestroyed(Object sender, EventArgs e) {
             this.appCtx.ExitThread();
         }
     }
