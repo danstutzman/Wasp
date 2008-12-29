@@ -20,9 +20,10 @@ namespace Wasp {
             topController.FormDestroyed += delegate(Object sender, EventArgs args) {
                 appCtx.ExitThread();
             };
-            topController.Show();
             model.InitTimer();
+            model.InitSchedule();
 
+            topController.Show();
             Application.Run(appCtx);
         }
     }

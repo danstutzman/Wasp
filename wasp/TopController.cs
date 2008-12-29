@@ -60,12 +60,13 @@ namespace Wasp {
             }));
         }
 
-        private void OnModelAlarmChange(Object sender, EventArgs e) {
+        private void OnModelAlarmChange(Object sender, AlarmEventArgs e) {
             this.form.BeginInvoke(new MethodInvoker(delegate() {
                 if (this.model.Alarmed) {
                     this.flashTimer.Start();
                     this.appBar.KeepOpen = true;
                     this.form.snoozeButton.Enabled = true;
+                    this.form.whyLabel.Text = e.alarm.eventName;
                 }
                 else {
                     this.flashTimer.Stop();
