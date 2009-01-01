@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace Wasp
 {
-    public partial class TopForm : Form
+    public partial class TopView : Form
     {
-        public TopForm()
+        public TopView()
         {
             InitializeComponent();
         }

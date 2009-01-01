@@ -1,6 +1,6 @@
 ﻿namespace Wasp
 {
-    partial class TopForm
+    partial class TopView
     {
         /// <summary>
         /// Required designer variable.

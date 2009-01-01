@@ -65,11 +65,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AlarmModel.cs" />
-    <Compile Include="AlarmControl.cs">
+    <Compile Include="AlarmView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="AlarmControl.Designer.cs">
-      <DependentUpon>AlarmControl.cs</DependentUpon>
+    <Compile Include="AlarmView.Designer.cs">
+      <DependentUpon>AlarmView.cs</DependentUpon>
     </Compile>
     <Compile Include="AlarmController.cs" />
     <Compile Include="AppBar.cs" />
@@ -90,19 +90,19 @@
     <Compile Include="TopModel.cs" />
     <Compile Include="ShellApi.cs" />
     <Compile Include="TopController.cs" />
-    <Compile Include="TopForm.cs">
+    <Compile Include="TopView.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TopForm.Designer.cs">
-      <DependentUpon>TopForm.cs</DependentUpon>
+    <Compile Include="TopView.Designer.cs">
+      <DependentUpon>TopView.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="AlarmControl.resx">
-      <DependentUpon>AlarmControl.cs</DependentUpon>
+    <EmbeddedResource Include="AlarmView.resx">
+      <DependentUpon>AlarmView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TopForm.resx">
-      <DependentUpon>TopForm.cs</DependentUpon>
+    <EmbeddedResource Include="TopView.resx">
+      <DependentUpon>TopView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -8,8 +8,8 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace Wasp {
-    public partial class AlarmControl : UserControl {
-        public AlarmControl() {
+    public partial class AlarmView : UserControl {
+        public AlarmView() {
             InitializeComponent();
         }
     }

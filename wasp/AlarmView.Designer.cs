@@ -1,5 +1,5 @@
 ﻿namespace Wasp {
-    partial class AlarmControl {
+    partial class AlarmView {
         /// <summary> 
         /// Required designer variable.
         /// </summary>

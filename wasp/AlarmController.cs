@@ -7,10 +7,10 @@ using System.Windows.Forms;
 namespace Wasp {
     class AlarmController : IDisposable {
         private AlarmModel model;
-        private AlarmControl view;
+        private AlarmView view;
         private Timer flashTimer;
 
-        public AlarmController(AlarmModel model, AlarmControl view) {
+        public AlarmController(AlarmModel model, AlarmView view) {
             this.model = model;
             this.view = view;
 

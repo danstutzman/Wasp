@@ -9,7 +9,7 @@ using System.ComponentModel;
 namespace Wasp {
     class TopController : IDisposable {
         private TopModel model;
-        private TopForm form;
+        private TopView form;
         private AppBar appBar;
         public event EventHandler FormDestroyed;
         private List<AlarmController> alarmControllers;
@@ -17,7 +17,7 @@ namespace Wasp {
         public TopController(TopModel model) {
             this.model = model;
 
-            this.form = new TopForm();
+            this.form = new TopView();
             this.form.Visible = false;
             this.form.HandleDestroyed += delegate(Object sender, EventArgs e) {
                 this.FormDestroyed(sender, e);
@@ -65,20 +65,21 @@ namespace Wasp {
                 this.alarmControllers = new List<AlarmController>();
                 List<AlarmModel> todaysAlarms = new List<AlarmModel>();
                 todaysAlarms.AddRange(this.model.Alarms.Where(delegate(AlarmModel alarm) {
-                    return alarm.when.Date == DateTime.Now.Date;
+                    // Can't arm an alarm if we have nothing listening to it
+                    return true; // alarm.when.Date == DateTime.Now.Date;
                 }));
                 for (int i = 0; i < todaysAlarms.Count; i++) {
                     AlarmModel alarm = todaysAlarms[i];
-                    AlarmControl control = new AlarmControl();
+                    AlarmView control = new AlarmView();
                     AlarmController controller = new AlarmController(alarm, control);
                     this.form.tableLayoutPanel.Controls.Add(control);
                     this.alarmControllers.Add(controller);
 
                     alarm.FiringChange += this.AlarmFiringChange;
                 }
-            }));
 
-            this.model.ArmAlarms();
+                this.model.ArmAlarms();
+            }));
         }
 
         private void AlarmFiringChange(Object sender, EventArgs e) {
