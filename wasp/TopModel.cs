@@ -37,9 +37,6 @@ namespace Wasp {
             }
         }
 
-        private bool alarmed;
-        public bool Alarmed { get { return this.alarmed; } }
-
         private String time;
         public String Time { get { return this.time; } }
 
@@ -63,13 +60,12 @@ namespace Wasp {
             scheduleRetriever.Start();
         }
 
-        public void SnoozeAlarm() {
+/*        public void SnoozeAlarm() {
             this.alarmed = false;
             this.AlarmChange(this, new AlarmEventArgs());
-        }
+        }*/
 
         private void TriggerAlarm(Alarm alarm) {
-            this.alarmed = true;
             this.AlarmChange(this, new AlarmEventArgs(alarm));
         }
 
@@ -109,6 +105,7 @@ namespace Wasp {
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(scheduleXml);
 
+            List<Alarm> alarmsToTrigger = new List<Alarm>();
             foreach (XmlNode alarmNode in doc.SelectSingleNode("schedule").ChildNodes) {
                 String alarmWhenString = alarmNode.Attributes.GetNamedItem("datetime").Value;
                 DateTime alarmWhen = DateTime.ParseExact(alarmWhenString, "yyyy-MM-dd HH:mm:ss",
@@ -119,20 +116,27 @@ namespace Wasp {
                 alarm.name = alarmNode.Attributes.GetNamedItem("name").Value;
                 alarm.when = alarmWhen;
 
-                this.scheduleTimer.AddJob(new TimerJob(new SingleEvent(alarmWhen),
-                    new DelegateMethodCall(new OneArgDelegate(TriggerAlarm), alarm)));
                 this.alarms.Add(alarm);
+                if (alarm.when > DateTime.Now)
+                    this.scheduleTimer.AddJob(new TimerJob(new SingleEvent(alarmWhen),
+                        new DelegateMethodCall(new OneArgDelegate(TriggerAlarm), alarm)));
+                else
+                    alarmsToTrigger.Add(alarm);
             }
 
             this.scheduleTimer.Start();
 
             this.ScheduleChange(this, new EventArgs());
+
+            foreach (Alarm alarmToTrigger in alarmsToTrigger)
+                TriggerAlarm(alarmToTrigger);
         }
     }
 
     struct Alarm {
         public String name;
         public DateTime when;
+        public bool IsGoingOff { get { return true; } }
     }
 
     class AlarmEventArgs : EventArgs {

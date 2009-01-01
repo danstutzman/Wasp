@@ -30,7 +30,6 @@
         {
             this.exitButton = new System.Windows.Forms.Button();
             this.pinCheckBox = new System.Windows.Forms.CheckBox();
-            this.snoozeButton = new System.Windows.Forms.Button();
             this.timeLabel = new System.Windows.Forms.Label();
             this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.SuspendLayout();
@@ -54,15 +53,6 @@
             this.pinCheckBox.TabIndex = 1;
             this.pinCheckBox.Text = "Pin";
             this.pinCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // snoozeButton
-            // 
-            this.snoozeButton.Location = new System.Drawing.Point(586, 7);
-            this.snoozeButton.Name = "snoozeButton";
-            this.snoozeButton.Size = new System.Drawing.Size(75, 23);
-            this.snoozeButton.TabIndex = 2;
-            this.snoozeButton.Text = "Snooze";
-            this.snoozeButton.UseVisualStyleBackColor = true;
             // 
             // timeLabel
             // 
@@ -95,7 +85,6 @@
             this.ClientSize = new System.Drawing.Size(754, 50);
             this.Controls.Add(this.tableLayoutPanel);
             this.Controls.Add(this.timeLabel);
-            this.Controls.Add(this.snoozeButton);
             this.Controls.Add(this.pinCheckBox);
             this.Controls.Add(this.exitButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -112,7 +101,6 @@
 
         public System.Windows.Forms.Button exitButton;
         public System.Windows.Forms.CheckBox pinCheckBox;
-        public System.Windows.Forms.Button snoozeButton;
         public System.Windows.Forms.Label timeLabel;
         public System.Windows.Forms.TableLayoutPanel tableLayoutPanel;
 

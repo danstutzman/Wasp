@@ -25,6 +25,7 @@
         private void InitializeComponent() {
             this.timeTextBox = new System.Windows.Forms.MaskedTextBox();
             this.nameTextBox = new System.Windows.Forms.TextBox();
+            this.offButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // timeTextBox
@@ -47,14 +48,24 @@
             this.nameTextBox.TabIndex = 1;
             this.nameTextBox.Text = "desc";
             // 
+            // offButton
+            // 
+            this.offButton.Location = new System.Drawing.Point(141, 4);
+            this.offButton.Name = "offButton";
+            this.offButton.Size = new System.Drawing.Size(44, 32);
+            this.offButton.TabIndex = 2;
+            this.offButton.Text = "OFF";
+            this.offButton.UseVisualStyleBackColor = true;
+            // 
             // AlarmControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.offButton);
             this.Controls.Add(this.nameTextBox);
             this.Controls.Add(this.timeTextBox);
             this.Name = "AlarmControl";
-            this.Size = new System.Drawing.Size(150, 37);
+            this.Size = new System.Drawing.Size(189, 37);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -64,6 +75,7 @@
 
         public System.Windows.Forms.MaskedTextBox timeTextBox;
         public System.Windows.Forms.TextBox nameTextBox;
+        public System.Windows.Forms.Button offButton;
 
     }
 }

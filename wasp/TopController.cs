@@ -13,7 +13,6 @@ namespace Wasp {
         private AppBar appBar;
         public event EventHandler FormDestroyed;
         private Timer flashTimer;
-        private bool backgroundIsRed;
 
         public TopController(TopModel model) {
             this.model = model;
@@ -33,10 +32,10 @@ namespace Wasp {
                 this.model.Pinned = this.form.pinCheckBox.Checked;
             };
 
-            this.form.snoozeButton.Click += delegate(Object sender, EventArgs e) {
+            /*this.form.snoozeButton.Click += delegate(Object sender, EventArgs e) {
                 this.model.SnoozeAlarm();
             };
-            this.form.snoozeButton.Enabled = this.model.Alarmed;
+            this.form.snoozeButton.Enabled = this.model.Alarmed;*/
 
             this.form.timeLabel.Text = this.model.Time;
 
@@ -46,7 +45,6 @@ namespace Wasp {
             this.model.ClockTick += OnClockTick;
             this.model.ScheduleChange += OnScheduleChange;
 
-            this.backgroundIsRed = false;
             this.flashTimer = new Timer();
             this.flashTimer.Tick += FlashBackground;
         }
@@ -63,17 +61,28 @@ namespace Wasp {
 
         private void OnModelAlarmChange(Object sender, AlarmEventArgs e) {
             this.form.BeginInvoke(new MethodInvoker(delegate() {
-                if (this.model.Alarmed) {
+                List<Alarm> todaysAlarms = new List<Alarm>();
+                todaysAlarms.AddRange(this.model.Alarms.Where(delegate(Alarm alarm) { return alarm.when.Date == DateTime.Now.Date; }));
+                int flashingAlarms = 0;
+                for (int i = 0; i < todaysAlarms.Count; i++) {
+                    Alarm alarm = todaysAlarms[i];
+                    AlarmControl control = this.form.tableLayoutPanel.Controls[i] as AlarmControl;
+                    if (alarm.IsGoingOff)
+                        flashingAlarms += 1;
+                    else {
+                        control.BackColor = System.Drawing.SystemColors.Control;
+                        control.timeTextBox.BackColor = System.Drawing.SystemColors.Control;
+                        control.nameTextBox.BackColor = System.Drawing.SystemColors.Control;
+                    }
+                }
+
+                if (flashingAlarms > 0) {
                     this.flashTimer.Start();
                     this.appBar.KeepOpen = true;
-                    this.form.snoozeButton.Enabled = true;
-                    //this.form.whyLabel.Text = e.alarm.eventName;
                 }
                 else {
                     this.flashTimer.Stop();
                     this.appBar.KeepOpen = false;
-                    this.form.BackColor = System.Drawing.SystemColors.Control;
-                    this.form.snoozeButton.Enabled = false;
                 }
             }));
         }
@@ -85,9 +94,24 @@ namespace Wasp {
         }
 
         private void FlashBackground(Object sender, EventArgs e) {
-            this.backgroundIsRed = !this.backgroundIsRed;
-            this.form.BackColor = this.backgroundIsRed ?
-                System.Drawing.Color.Red : System.Drawing.SystemColors.Control;
+            List<Alarm> todaysAlarms = new List<Alarm>();
+            todaysAlarms.AddRange(this.model.Alarms.Where(delegate(Alarm alarm) { return alarm.when.Date == DateTime.Now.Date; }));
+            for (int i = 0; i < todaysAlarms.Count; i++) {
+                Alarm alarm = todaysAlarms[i];
+                AlarmControl control = this.form.tableLayoutPanel.Controls[i] as AlarmControl;
+                if (alarm.IsGoingOff) {
+                    if (control.BackColor != System.Drawing.Color.Red) {
+                        control.BackColor = System.Drawing.Color.Red;
+                        control.timeTextBox.BackColor = System.Drawing.Color.Red;
+                        control.nameTextBox.BackColor = System.Drawing.Color.Red;
+                    }
+                    else {
+                        control.BackColor = System.Drawing.SystemColors.Control;
+                        control.timeTextBox.BackColor = System.Drawing.SystemColors.Control;
+                        control.nameTextBox.BackColor = System.Drawing.SystemColors.Control;
+                    }
+                }
+            }
         }
 
         private void OnScheduleChange(Object sender, EventArgs e) {
