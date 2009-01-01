@@ -40,17 +40,11 @@ namespace Wasp {
 
             this.form.timeLabel.Text = this.model.Time;
 
-            Button button = new Button();
-            button.Text = "test";
-            this.form.tableLayoutPanel.Controls.Add(button);
-
-            AlarmControl control = new AlarmControl();
-            this.form.tableLayoutPanel.Controls.Add(control);
-
             this.appBar = new AppBar(this.form, !this.model.Pinned);
             this.model.PinnedChange += OnModelPinnedChange;
             this.model.AlarmChange += OnModelAlarmChange;
             this.model.ClockTick += OnClockTick;
+            this.model.ScheduleChange += OnScheduleChange;
 
             this.backgroundIsRed = false;
             this.flashTimer = new Timer();
@@ -94,6 +88,27 @@ namespace Wasp {
             this.backgroundIsRed = !this.backgroundIsRed;
             this.form.BackColor = this.backgroundIsRed ?
                 System.Drawing.Color.Red : System.Drawing.SystemColors.Control;
+        }
+
+        private void OnScheduleChange(Object sender, EventArgs e) {
+            this.form.BeginInvoke(new MethodInvoker(delegate() {
+                List<Alarm> todaysAlarms = new List<Alarm>();
+                todaysAlarms.AddRange(this.model.Alarms.Where(delegate(Alarm alarm) { return alarm.when.Date == DateTime.Now.Date; }));
+                for (int i = 0; i < todaysAlarms.Count; i++) {
+                    Alarm alarm = todaysAlarms[i];
+                    AlarmControl control;
+                    if (i >= this.form.tableLayoutPanel.Controls.Count) {
+                        control = new AlarmControl();
+                        this.form.tableLayoutPanel.Controls.Add(control);
+                    }
+                    else
+                        control = this.form.tableLayoutPanel.Controls[i] as AlarmControl;
+                    control.timeTextBox.Text = alarm.when.ToString("HH:mm");
+                    control.nameTextBox.Text = alarm.name;
+                }
+                for (int i = todaysAlarms.Count; i < this.form.tableLayoutPanel.Controls.Count; i++)
+                    this.form.tableLayoutPanel.Controls.RemoveAt(i);
+            }));
         }
 
         /// Releases the screen area held by the appBar back to the OS

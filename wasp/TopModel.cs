@@ -19,10 +19,29 @@ namespace Wasp {
         public event EventHandler PinnedChange;
         public event EventHandler<AlarmEventArgs> AlarmChange;
         public event EventHandler ClockTick;
+        public event EventHandler ScheduleChange;
 
         private ScheduleTimer scheduleTimer;
+
         private List<Alarm> alarms;
+        public List<Alarm> Alarms { get { return this.alarms; } }
+
         private DateTime scheduleLastModified;
+
+        private bool pinned;
+        public bool Pinned {
+            get { return this.pinned; }
+            set {
+                this.pinned = value;
+                this.PinnedChange(this, new EventArgs());
+            }
+        }
+
+        private bool alarmed;
+        public bool Alarmed { get { return this.alarmed; } }
+
+        private String time;
+        public String Time { get { return this.time; } }
 
         public TopModel() {
             //this.pinned = true;
@@ -43,47 +62,6 @@ namespace Wasp {
             scheduleRetriever.Tick += TimeToCheckSchedule;
             scheduleRetriever.Start();
         }
-
-        public void InstallSchedule(String scheduleXml) {
-            this.alarms = new List<Alarm>();
-            this.scheduleTimer.Stop();
-            this.scheduleTimer.ClearJobs();
-
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(scheduleXml);
-
-            foreach (XmlNode alarmNode in doc.SelectSingleNode("schedule").ChildNodes) {
-                String alarmWhenString = alarmNode.Attributes.GetNamedItem("datetime").Value;
-                DateTime alarmWhen = DateTime.ParseExact(alarmWhenString, "yyyy-MM-dd HH:mm:ss",
-                    CultureInfo.InvariantCulture);
-                Console.WriteLine("when: {0}", alarmWhen);
-
-                Alarm alarm = new Alarm();
-                alarm.name = alarmNode.Attributes.GetNamedItem("name").Value;
-                alarm.when = alarmWhen;
-
-                this.scheduleTimer.AddJob(new TimerJob(new SingleEvent(alarmWhen),
-                    new DelegateMethodCall(new OneArgDelegate(TriggerAlarm), alarm)));
-                this.alarms.Add(alarm);
-            }
-
-            this.scheduleTimer.Start();
-        }
-
-        private bool pinned;
-        public bool Pinned {
-            get { return this.pinned; }
-            set {
-                this.pinned = value;
-                this.PinnedChange(this, new EventArgs());
-            }
-        }
-
-        private bool alarmed;
-        public bool Alarmed { get { return this.alarmed; } }
-
-        private String time;
-        public String Time { get { return this.time; } }
 
         public void SnoozeAlarm() {
             this.alarmed = false;
@@ -121,6 +99,34 @@ namespace Wasp {
                         response.Close();
                 }
             }, null);
+        }
+
+        private void InstallSchedule(String scheduleXml) {
+            this.alarms = new List<Alarm>();
+            this.scheduleTimer.Stop();
+            this.scheduleTimer.ClearJobs();
+
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(scheduleXml);
+
+            foreach (XmlNode alarmNode in doc.SelectSingleNode("schedule").ChildNodes) {
+                String alarmWhenString = alarmNode.Attributes.GetNamedItem("datetime").Value;
+                DateTime alarmWhen = DateTime.ParseExact(alarmWhenString, "yyyy-MM-dd HH:mm:ss",
+                    CultureInfo.InvariantCulture);
+                Console.WriteLine("when: {0}", alarmWhen);
+
+                Alarm alarm = new Alarm();
+                alarm.name = alarmNode.Attributes.GetNamedItem("name").Value;
+                alarm.when = alarmWhen;
+
+                this.scheduleTimer.AddJob(new TimerJob(new SingleEvent(alarmWhen),
+                    new DelegateMethodCall(new OneArgDelegate(TriggerAlarm), alarm)));
+                this.alarms.Add(alarm);
+            }
+
+            this.scheduleTimer.Start();
+
+            this.ScheduleChange(this, new EventArgs());
         }
     }
 

@@ -23,32 +23,36 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.maskedTextBox1 = new System.Windows.Forms.MaskedTextBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.timeTextBox = new System.Windows.Forms.MaskedTextBox();
+            this.nameTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
-            // maskedTextBox1
+            // timeTextBox
             // 
-            this.maskedTextBox1.Location = new System.Drawing.Point(8, 7);
-            this.maskedTextBox1.Name = "maskedTextBox1";
-            this.maskedTextBox1.Size = new System.Drawing.Size(38, 20);
-            this.maskedTextBox1.TabIndex = 0;
-            this.maskedTextBox1.Text = "88:88";
+            this.timeTextBox.Font = new System.Drawing.Font("Arial Narrow", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.timeTextBox.Location = new System.Drawing.Point(0, 0);
+            this.timeTextBox.Name = "timeTextBox";
+            this.timeTextBox.ReadOnly = true;
+            this.timeTextBox.Size = new System.Drawing.Size(61, 38);
+            this.timeTextBox.TabIndex = 0;
+            this.timeTextBox.Text = "12:88";
             // 
-            // textBox1
+            // nameTextBox
             // 
-            this.textBox1.Location = new System.Drawing.Point(55, 7);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(62, 20);
-            this.textBox1.TabIndex = 1;
-            this.textBox1.Text = "desc";
+            this.nameTextBox.Font = new System.Drawing.Font("Arial Narrow", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.nameTextBox.Location = new System.Drawing.Point(67, 0);
+            this.nameTextBox.Name = "nameTextBox";
+            this.nameTextBox.ReadOnly = true;
+            this.nameTextBox.Size = new System.Drawing.Size(72, 38);
+            this.nameTextBox.TabIndex = 1;
+            this.nameTextBox.Text = "desc";
             // 
             // AlarmControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.maskedTextBox1);
+            this.Controls.Add(this.nameTextBox);
+            this.Controls.Add(this.timeTextBox);
             this.Name = "AlarmControl";
             this.Size = new System.Drawing.Size(150, 37);
             this.ResumeLayout(false);
@@ -58,8 +62,8 @@
 
         #endregion
 
-        private System.Windows.Forms.MaskedTextBox maskedTextBox1;
-        private System.Windows.Forms.TextBox textBox1;
+        public System.Windows.Forms.MaskedTextBox timeTextBox;
+        public System.Windows.Forms.TextBox nameTextBox;
 
     }
 }
