@@ -41,11 +41,10 @@ namespace Wasp {
 
         List<AlarmModel> alarmsToFireAsap;
 
-        public void ArmAlarms() {
+        public void ReadyForAlarms() {
             this.scheduleTimer.Start();
-            foreach (AlarmModel alarm in this.alarmsToFireAsap) {
+            foreach (AlarmModel alarm in this.alarmsToFireAsap)
                 alarm.Fire();
-            }
             this.alarmsToFireAsap.Clear();
         }
 
@@ -115,16 +114,19 @@ namespace Wasp {
                     CultureInfo.InvariantCulture);
                 Console.WriteLine("when: {0}", alarmWhen);
 
-                AlarmModel alarm = new AlarmModel();
-                alarm.name = alarmNode.Attributes.GetNamedItem("name").Value;
-                alarm.when = alarmWhen;
+                String id = alarmNode.Attributes.GetNamedItem("id").Value;
+                String name = alarmNode.Attributes.GetNamedItem("name").Value;
+                bool isArmed = alarmNode.Attributes.GetNamedItem("armed").Value.Equals("true");
+                AlarmModel alarm = new AlarmModel(id, name, alarmWhen, isArmed);
 
                 this.alarms.Add(alarm);
-                if (alarm.when > DateTime.Now)
-                    this.scheduleTimer.AddJob(new TimerJob(new SingleEvent(alarmWhen),
-                        new DelegateMethodCall(new OneArgDelegate(FireAlarm), alarm)));
-                else
-                    this.alarmsToFireAsap.Add(alarm);
+                if (alarm.IsArmed) {
+                    if (alarm.When > DateTime.Now)
+                        this.scheduleTimer.AddJob(new TimerJob(new SingleEvent(alarmWhen),
+                            new DelegateMethodCall(new OneArgDelegate(FireAlarm), alarm)));
+                    else
+                        this.alarmsToFireAsap.Add(alarm);
+                }
             }
 
             this.ScheduleChange(this, new EventArgs());

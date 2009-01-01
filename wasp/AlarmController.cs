@@ -14,8 +14,9 @@ namespace Wasp {
             this.model = model;
             this.view = view;
 
-            this.view.timeTextBox.Text = this.model.when.ToString("HH:mm");
-            this.view.nameTextBox.Text = this.model.name;
+            this.view.timeTextBox.Text = this.model.When.ToString("HH:mm");
+            this.view.nameTextBox.Text = this.model.Name;
+            this.view.offButton.Enabled = this.model.IsArmed;
 
             this.view.offButton.Click += OnClickOffButton;
 
@@ -59,6 +60,9 @@ namespace Wasp {
 
         private void OnClickOffButton(Object sender, EventArgs e) {
             this.model.TurnOff();
+            this.view.BeginInvoke(new MethodInvoker(delegate() {
+                this.view.offButton.Enabled = false;
+            }));
         }
 
         public void Dispose() {

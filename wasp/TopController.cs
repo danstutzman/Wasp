@@ -81,7 +81,7 @@ namespace Wasp {
                     alarm.FiringChange += this.AlarmFiringChange;
                 }
 
-                this.model.ArmAlarms();
+                this.model.ReadyForAlarms();
             }));
         }
 
