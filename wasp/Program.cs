@@ -21,7 +21,6 @@ namespace Wasp {
                 appCtx.ExitThread();
             };
             model.InitTimer();
-            model.InitSchedule();
 
             topController.Show();
             Application.Run(appCtx);

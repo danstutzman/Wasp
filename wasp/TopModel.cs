@@ -8,6 +8,8 @@ using System.Xml.XPath;
 using Schedule;
 using System.Globalization;
 using System.Collections.Generic;
+using System.Net;
+using System.IO;
 
 namespace Wasp {
     class TopModel {
@@ -20,6 +22,7 @@ namespace Wasp {
 
         private ScheduleTimer scheduleTimer;
         private List<Alarm> alarms;
+        private DateTime scheduleLastModified;
 
         public TopModel() {
             //this.pinned = true;
@@ -34,18 +37,26 @@ namespace Wasp {
             clock.Interval = 1000;
             clock.Tick += Tick;
             clock.Start();
+
+            Timer scheduleRetriever = new Timer();
+            scheduleRetriever.Interval = 3000;
+            scheduleRetriever.Tick += TimeToCheckSchedule;
+            scheduleRetriever.Start();
         }
 
-        public void InitSchedule() {
+        public void InstallSchedule(String scheduleXml) {
             this.alarms = new List<Alarm>();
+            this.scheduleTimer.Stop();
+            this.scheduleTimer.ClearJobs();
 
             XmlDocument doc = new XmlDocument();
-            doc.Load("../../schedule.xml");
+            doc.LoadXml(scheduleXml);
+
             foreach (XmlNode eventNode in doc.SelectSingleNode("schedule").ChildNodes) {
-                String eventName = eventNode.Attributes.GetNamedItem("name").Value;
+                String eventName = eventNode.Attributes.GetNamedItem("short_name").Value;
                 //Console.WriteLine("event: {0}", eventName);
                 foreach (XmlNode alarmNode in eventNode.ChildNodes) {
-                    String alarmWhenString = alarmNode.Attributes.GetNamedItem("when").Value;
+                    String alarmWhenString = alarmNode.Attributes.GetNamedItem("datetime").Value;
                     DateTime alarmWhen = DateTime.ParseExact(alarmWhenString, "yyyy-MM-dd HH:mm:ss",
                         CultureInfo.InvariantCulture);
                     Console.WriteLine("when: {0}", alarmWhen);
@@ -53,10 +64,11 @@ namespace Wasp {
                     Alarm alarm = new Alarm();
                     alarm.eventName = eventName;
                     this.scheduleTimer.AddJob(new TimerJob(new SingleEvent(alarmWhen),
-                        new DelegateMethodCall(new OneArgDelegate(TriggerAlarm2), alarm)));
+                        new DelegateMethodCall(new OneArgDelegate(TriggerAlarm), alarm)));
                     this.alarms.Add(alarm);
                 }
             }
+
             this.scheduleTimer.Start();
         }
 
@@ -80,12 +92,7 @@ namespace Wasp {
             this.AlarmChange(this, new AlarmEventArgs());
         }
 
-        //private void TriggerAlarm() {
-        //    this.alarmed = true;
-        //    this.AlarmChange(this, new EventArgs());
-        //}
-
-        private void TriggerAlarm2(Alarm alarm) {
+        private void TriggerAlarm(Alarm alarm) {
             this.alarmed = true;
             this.AlarmChange(this, new AlarmEventArgs(alarm));
         }
@@ -93,6 +100,31 @@ namespace Wasp {
         private void Tick(Object sender, EventArgs e) {
             this.time = DateTime.Now.ToLongTimeString();
             this.ClockTick(this, new EventArgs());
+        }
+
+        private void TimeToCheckSchedule(Object sender, EventArgs args) {
+            HttpWebRequest request = WebRequest.Create("http://localhost:3000/schedule.xml") as HttpWebRequest;
+            request.IfModifiedSince = this.scheduleLastModified;
+            request.BeginGetResponse(delegate(IAsyncResult result) {
+                WebResponse response = null;
+                try {
+                    response = request.EndGetResponse(result);
+                    string xml = new StreamReader(response.GetResponseStream()).ReadToEnd();
+                    this.scheduleLastModified = DateTime.Parse(response.Headers.Get("Last-Modified"));
+                    this.InstallSchedule(xml);
+                }
+                catch (WebException e) {
+                    HttpWebResponse response2 = e.Response as HttpWebResponse;
+                    if (response2.StatusCode == HttpStatusCode.NotModified)
+                        ; // no problem
+                    else
+                        throw e;
+                }
+                finally {
+                    if (response != null)
+                        response.Close();
+                }
+            }, null);
         }
     }
 
