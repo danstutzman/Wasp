@@ -62,6 +62,7 @@ namespace Wasp {
         }
 
         public void Dispose() {
+            this.flashTimer.Stop();
         }
     }
 }

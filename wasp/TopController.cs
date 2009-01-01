@@ -58,9 +58,12 @@ namespace Wasp {
 
         private void OnScheduleChange(Object sender, EventArgs e) {
             this.form.BeginInvoke(new MethodInvoker(delegate() {
-                if (this.alarmControllers != null)
-                    foreach (AlarmController alarmController in this.alarmControllers)
-                        alarmController.Dispose();
+                if (this.alarmControllers != null) {
+                    for (int i = 0; i < this.alarmControllers.Count; i++) {
+                        this.form.tableLayoutPanel.Controls.RemoveAt(i);
+                        this.alarmControllers[i].Dispose();
+                    }
+                }
 
                 this.alarmControllers = new List<AlarmController>();
                 List<AlarmModel> todaysAlarms = new List<AlarmModel>();
