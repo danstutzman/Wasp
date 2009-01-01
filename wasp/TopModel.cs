@@ -52,21 +52,19 @@ namespace Wasp {
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(scheduleXml);
 
-            foreach (XmlNode eventNode in doc.SelectSingleNode("schedule").ChildNodes) {
-                String eventName = eventNode.Attributes.GetNamedItem("short_name").Value;
-                //Console.WriteLine("event: {0}", eventName);
-                foreach (XmlNode alarmNode in eventNode.ChildNodes) {
-                    String alarmWhenString = alarmNode.Attributes.GetNamedItem("datetime").Value;
-                    DateTime alarmWhen = DateTime.ParseExact(alarmWhenString, "yyyy-MM-dd HH:mm:ss",
-                        CultureInfo.InvariantCulture);
-                    Console.WriteLine("when: {0}", alarmWhen);
+            foreach (XmlNode alarmNode in doc.SelectSingleNode("schedule").ChildNodes) {
+                String alarmWhenString = alarmNode.Attributes.GetNamedItem("datetime").Value;
+                DateTime alarmWhen = DateTime.ParseExact(alarmWhenString, "yyyy-MM-dd HH:mm:ss",
+                    CultureInfo.InvariantCulture);
+                Console.WriteLine("when: {0}", alarmWhen);
 
-                    Alarm alarm = new Alarm();
-                    alarm.eventName = eventName;
-                    this.scheduleTimer.AddJob(new TimerJob(new SingleEvent(alarmWhen),
-                        new DelegateMethodCall(new OneArgDelegate(TriggerAlarm), alarm)));
-                    this.alarms.Add(alarm);
-                }
+                Alarm alarm = new Alarm();
+                alarm.name = alarmNode.Attributes.GetNamedItem("name").Value;
+                alarm.when = alarmWhen;
+
+                this.scheduleTimer.AddJob(new TimerJob(new SingleEvent(alarmWhen),
+                    new DelegateMethodCall(new OneArgDelegate(TriggerAlarm), alarm)));
+                this.alarms.Add(alarm);
             }
 
             this.scheduleTimer.Start();
@@ -115,9 +113,7 @@ namespace Wasp {
                 }
                 catch (WebException e) {
                     HttpWebResponse response2 = e.Response as HttpWebResponse;
-                    if (response2.StatusCode == HttpStatusCode.NotModified)
-                        ; // no problem
-                    else
+                    if (response2.StatusCode != HttpStatusCode.NotModified)
                         throw e;
                 }
                 finally {
@@ -129,7 +125,7 @@ namespace Wasp {
     }
 
     struct Alarm {
-        public String eventName;
+        public String name;
         public DateTime when;
     }
 

@@ -32,12 +32,12 @@
             this.pinCheckBox = new System.Windows.Forms.CheckBox();
             this.snoozeButton = new System.Windows.Forms.Button();
             this.timeLabel = new System.Windows.Forms.Label();
-            this.whyLabel = new System.Windows.Forms.Label();
+            this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.SuspendLayout();
             // 
             // exitButton
             // 
-            this.exitButton.Location = new System.Drawing.Point(327, 15);
+            this.exitButton.Location = new System.Drawing.Point(667, 2);
             this.exitButton.Name = "exitButton";
             this.exitButton.Size = new System.Drawing.Size(75, 23);
             this.exitButton.TabIndex = 0;
@@ -48,7 +48,7 @@
             // 
             this.pinCheckBox.Appearance = System.Windows.Forms.Appearance.Button;
             this.pinCheckBox.AutoSize = true;
-            this.pinCheckBox.Location = new System.Drawing.Point(186, 12);
+            this.pinCheckBox.Location = new System.Drawing.Point(667, 22);
             this.pinCheckBox.Name = "pinCheckBox";
             this.pinCheckBox.Size = new System.Drawing.Size(32, 23);
             this.pinCheckBox.TabIndex = 1;
@@ -57,7 +57,7 @@
             // 
             // snoozeButton
             // 
-            this.snoozeButton.Location = new System.Drawing.Point(237, 12);
+            this.snoozeButton.Location = new System.Drawing.Point(586, 7);
             this.snoozeButton.Name = "snoozeButton";
             this.snoozeButton.Size = new System.Drawing.Size(75, 23);
             this.snoozeButton.TabIndex = 2;
@@ -73,21 +73,27 @@
             this.timeLabel.TabIndex = 3;
             this.timeLabel.Text = "88:88:88";
             // 
-            // whyLabel
+            // tableLayoutPanel
             // 
-            this.whyLabel.AutoSize = true;
-            this.whyLabel.Location = new System.Drawing.Point(84, 22);
-            this.whyLabel.Name = "whyLabel";
-            this.whyLabel.Size = new System.Drawing.Size(52, 13);
-            this.whyLabel.TabIndex = 4;
-            this.whyLabel.Text = "whyLabel";
+            this.tableLayoutPanel.BackColor = System.Drawing.Color.Silver;
+            this.tableLayoutPanel.ColumnCount = 3;
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.AddColumns;
+            this.tableLayoutPanel.Location = new System.Drawing.Point(71, 7);
+            this.tableLayoutPanel.Name = "tableLayoutPanel";
+            this.tableLayoutPanel.RowCount = 1;
+            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel.Size = new System.Drawing.Size(489, 34);
+            this.tableLayoutPanel.TabIndex = 5;
             // 
             // TopForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(500, 50);
-            this.Controls.Add(this.whyLabel);
+            this.ClientSize = new System.Drawing.Size(754, 50);
+            this.Controls.Add(this.tableLayoutPanel);
             this.Controls.Add(this.timeLabel);
             this.Controls.Add(this.snoozeButton);
             this.Controls.Add(this.pinCheckBox);
@@ -108,7 +114,7 @@
         public System.Windows.Forms.CheckBox pinCheckBox;
         public System.Windows.Forms.Button snoozeButton;
         public System.Windows.Forms.Label timeLabel;
-        public System.Windows.Forms.Label whyLabel;
+        public System.Windows.Forms.TableLayoutPanel tableLayoutPanel;
 
     }
 }

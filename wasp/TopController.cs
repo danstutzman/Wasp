@@ -40,6 +40,13 @@ namespace Wasp {
 
             this.form.timeLabel.Text = this.model.Time;
 
+            Button button = new Button();
+            button.Text = "test";
+            this.form.tableLayoutPanel.Controls.Add(button);
+
+            AlarmControl control = new AlarmControl();
+            this.form.tableLayoutPanel.Controls.Add(control);
+
             this.appBar = new AppBar(this.form, !this.model.Pinned);
             this.model.PinnedChange += OnModelPinnedChange;
             this.model.AlarmChange += OnModelAlarmChange;
@@ -66,7 +73,7 @@ namespace Wasp {
                     this.flashTimer.Start();
                     this.appBar.KeepOpen = true;
                     this.form.snoozeButton.Enabled = true;
-                    this.form.whyLabel.Text = e.alarm.eventName;
+                    //this.form.whyLabel.Text = e.alarm.eventName;
                 }
                 else {
                     this.flashTimer.Stop();

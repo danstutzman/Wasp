@@ -1,6 +1,3 @@
 <schedule>
-  <event short_name='Accompany at church'>
-    <alarm datetime='2009-01-03 09:30:00'/>
-    <alarm datetime='2009-01-01 09:06:00'/>
-  </event>
+  <alarm name='testevent4' datetime='2009-01-01 09:56:00'/>
 </schedule>

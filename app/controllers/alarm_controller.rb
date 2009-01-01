@@ -23,6 +23,7 @@ class AlarmController < ApplicationController
   def create
     @alarm = Alarm.new(params[:alarm])
     if @alarm.save
+      write_to_xml
       flash[:notice] = 'Alarm was successfully created.'
       redirect_to :action => 'list'
     else
@@ -37,6 +38,7 @@ class AlarmController < ApplicationController
   def update
     @alarm = Alarm.find(params[:id])
     if @alarm.update_attributes(params[:alarm])
+      write_to_xml
       flash[:notice] = 'Alarm was successfully updated.'
       redirect_to :action => 'show', :id => @alarm
     else
@@ -46,6 +48,19 @@ class AlarmController < ApplicationController
 
   def destroy
     Alarm.find(params[:id]).destroy
+    write_to_xml
     redirect_to :action => 'list'
+  end
+
+  private
+  def write_to_xml
+    File.open('public/schedule2.xml', 'w') { |file|
+      file.write "<schedule>\n"
+      Alarm.find(:all, :order => 'id').each { |alarm|
+        file.write "  <alarm name='#{alarm.name}' datetime='#{DateTime.parse(alarm.datetime).strftime('%Y-%m-%d %H:%M:%S')}'/>\n"
+      }
+      file.write "</schedule>\n"
+    }
+    FileUtils.mv 'public/schedule2.xml', 'public/schedule.xml'
   end
 end
