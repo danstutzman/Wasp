@@ -14,7 +14,7 @@ using System.IO;
 namespace Wasp {
     class TopModel {
         private delegate void NoArgsDelegate();
-        private delegate void OneArgDelegate(Alarm alarm);
+        private delegate void OneArgDelegate(AlarmModel alarm);
 
         public event EventHandler PinnedChange;
         public event EventHandler ClockTick;
@@ -22,8 +22,8 @@ namespace Wasp {
 
         private ScheduleTimer scheduleTimer;
 
-        private List<Alarm> alarms;
-        public List<Alarm> Alarms { get { return this.alarms; } }
+        private List<AlarmModel> alarms;
+        public List<AlarmModel> Alarms { get { return this.alarms; } }
 
         private DateTime scheduleLastModified;
 
@@ -39,11 +39,11 @@ namespace Wasp {
         private String time;
         public String Time { get { return this.time; } }
 
-        List<Alarm> alarmsToFireAsap;
+        List<AlarmModel> alarmsToFireAsap;
 
         public void ArmAlarms() {
             this.scheduleTimer.Start();
-            foreach (Alarm alarm in this.alarmsToFireAsap) {
+            foreach (AlarmModel alarm in this.alarmsToFireAsap) {
                 alarm.Fire();
             }
             this.alarmsToFireAsap.Clear();
@@ -68,7 +68,7 @@ namespace Wasp {
             scheduleRetriever.Start();
         }
 
-        private void FireAlarm(Alarm alarm) {
+        private void FireAlarm(AlarmModel alarm) {
             alarm.Fire();
         }
 
@@ -101,21 +101,21 @@ namespace Wasp {
         }
 
         private void InstallSchedule(String scheduleXml) {
-            this.alarms = new List<Alarm>();
+            this.alarms = new List<AlarmModel>();
             this.scheduleTimer.Stop();
             this.scheduleTimer.ClearJobs();
 
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(scheduleXml);
 
-            this.alarmsToFireAsap = new List<Alarm>();
+            this.alarmsToFireAsap = new List<AlarmModel>();
             foreach (XmlNode alarmNode in doc.SelectSingleNode("schedule").ChildNodes) {
                 String alarmWhenString = alarmNode.Attributes.GetNamedItem("datetime").Value;
                 DateTime alarmWhen = DateTime.ParseExact(alarmWhenString, "yyyy-MM-dd HH:mm:ss",
                     CultureInfo.InvariantCulture);
                 Console.WriteLine("when: {0}", alarmWhen);
 
-                Alarm alarm = new Alarm();
+                AlarmModel alarm = new AlarmModel();
                 alarm.name = alarmNode.Attributes.GetNamedItem("name").Value;
                 alarm.when = alarmWhen;
 
@@ -133,10 +133,10 @@ namespace Wasp {
 
  
     class AlarmEventArgs : EventArgs {
-        public Alarm alarm;
+        public AlarmModel alarm;
         public AlarmEventArgs() {
         }
-        public AlarmEventArgs(Alarm alarm) {
+        public AlarmEventArgs(AlarmModel alarm) {
             this.alarm = alarm;
         }
     }

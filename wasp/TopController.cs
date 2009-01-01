@@ -63,12 +63,12 @@ namespace Wasp {
                         alarmController.Dispose();
 
                 this.alarmControllers = new List<AlarmController>();
-                List<Alarm> todaysAlarms = new List<Alarm>();
-                todaysAlarms.AddRange(this.model.Alarms.Where(delegate(Alarm alarm) {
+                List<AlarmModel> todaysAlarms = new List<AlarmModel>();
+                todaysAlarms.AddRange(this.model.Alarms.Where(delegate(AlarmModel alarm) {
                     return alarm.when.Date == DateTime.Now.Date;
                 }));
                 for (int i = 0; i < todaysAlarms.Count; i++) {
-                    Alarm alarm = todaysAlarms[i];
+                    AlarmModel alarm = todaysAlarms[i];
                     AlarmControl control = new AlarmControl();
                     AlarmController controller = new AlarmController(alarm, control);
                     this.form.tableLayoutPanel.Controls.Add(control);
@@ -83,7 +83,7 @@ namespace Wasp {
 
         private void AlarmFiringChange(Object sender, EventArgs e) {
             bool noAlarmsFiring = true;
-            foreach (Alarm alarm in this.model.Alarms)
+            foreach (AlarmModel alarm in this.model.Alarms)
                 if (alarm.IsFiring)
                     noAlarmsFiring = false;
 

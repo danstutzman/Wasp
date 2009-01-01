@@ -64,7 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Alarm.cs" />
+    <Compile Include="AlarmModel.cs" />
     <Compile Include="AlarmControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

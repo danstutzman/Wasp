@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Wasp {
-    class Alarm {
+    class AlarmModel {
         public event EventHandler FiringChange;
 
         public String name;
@@ -13,7 +13,7 @@ namespace Wasp {
         private bool isFiring;
         public bool IsFiring { get { return this.isFiring; } }
 
-        public Alarm() {
+        public AlarmModel() {
         }
 
         public void Fire() {
