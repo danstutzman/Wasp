@@ -64,12 +64,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Alarm.cs" />
     <Compile Include="AlarmControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="AlarmControl.Designer.cs">
       <DependentUpon>AlarmControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="AlarmController.cs" />
     <Compile Include="AppBar.cs" />
     <Compile Include="ScheduleTimer\BlockWrapper.cs" />
     <Compile Include="ScheduleTimer\EventInstance.cs" />

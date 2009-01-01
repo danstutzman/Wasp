@@ -17,7 +17,6 @@ namespace Wasp {
         private delegate void OneArgDelegate(Alarm alarm);
 
         public event EventHandler PinnedChange;
-        public event EventHandler<AlarmEventArgs> AlarmChange;
         public event EventHandler ClockTick;
         public event EventHandler ScheduleChange;
 
@@ -40,14 +39,23 @@ namespace Wasp {
         private String time;
         public String Time { get { return this.time; } }
 
+        List<Alarm> alarmsToFireAsap;
+
+        public void ArmAlarms() {
+            this.scheduleTimer.Start();
+            foreach (Alarm alarm in this.alarmsToFireAsap) {
+                alarm.Fire();
+            }
+            this.alarmsToFireAsap.Clear();
+        }
+
         public TopModel() {
-            //this.pinned = true;
             this.time = DateTime.Now.ToLongTimeString();
+            this.alarmsToFireAsap = null;
         }
 
         public void InitTimer() {
             this.scheduleTimer = new ScheduleTimer();
-            //            this.scheduleTimer.Start();
 
             Timer clock = new Timer();
             clock.Interval = 1000;
@@ -60,13 +68,8 @@ namespace Wasp {
             scheduleRetriever.Start();
         }
 
-/*        public void SnoozeAlarm() {
-            this.alarmed = false;
-            this.AlarmChange(this, new AlarmEventArgs());
-        }*/
-
-        private void TriggerAlarm(Alarm alarm) {
-            this.AlarmChange(this, new AlarmEventArgs(alarm));
+        private void FireAlarm(Alarm alarm) {
+            alarm.Fire();
         }
 
         private void Tick(Object sender, EventArgs e) {
@@ -105,7 +108,7 @@ namespace Wasp {
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(scheduleXml);
 
-            List<Alarm> alarmsToTrigger = new List<Alarm>();
+            this.alarmsToFireAsap = new List<Alarm>();
             foreach (XmlNode alarmNode in doc.SelectSingleNode("schedule").ChildNodes) {
                 String alarmWhenString = alarmNode.Attributes.GetNamedItem("datetime").Value;
                 DateTime alarmWhen = DateTime.ParseExact(alarmWhenString, "yyyy-MM-dd HH:mm:ss",
@@ -119,26 +122,16 @@ namespace Wasp {
                 this.alarms.Add(alarm);
                 if (alarm.when > DateTime.Now)
                     this.scheduleTimer.AddJob(new TimerJob(new SingleEvent(alarmWhen),
-                        new DelegateMethodCall(new OneArgDelegate(TriggerAlarm), alarm)));
+                        new DelegateMethodCall(new OneArgDelegate(FireAlarm), alarm)));
                 else
-                    alarmsToTrigger.Add(alarm);
+                    this.alarmsToFireAsap.Add(alarm);
             }
 
-            this.scheduleTimer.Start();
-
             this.ScheduleChange(this, new EventArgs());
-
-            foreach (Alarm alarmToTrigger in alarmsToTrigger)
-                TriggerAlarm(alarmToTrigger);
         }
     }
 
-    struct Alarm {
-        public String name;
-        public DateTime when;
-        public bool IsGoingOff { get { return true; } }
-    }
-
+ 
     class AlarmEventArgs : EventArgs {
         public Alarm alarm;
         public AlarmEventArgs() {
