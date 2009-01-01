@@ -73,6 +73,7 @@
     </Compile>
     <Compile Include="AlarmController.cs" />
     <Compile Include="AppBar.cs" />
+    <Compile Include="ScheduleService.cs" />
     <Compile Include="ScheduleTimer\BlockWrapper.cs" />
     <Compile Include="ScheduleTimer\EventInstance.cs" />
     <Compile Include="ScheduleTimer\EventQueue.cs" />

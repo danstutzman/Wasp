@@ -36,24 +36,9 @@ namespace Wasp {
             FiringChange(this, new EventArgs());
         }
 
-
-
         public void TurnOff() {
             this.isFiring = false;
             FiringChange(this, new EventArgs());
-
-            byte[] byteArray = Encoding.UTF8.GetBytes("");
-            HttpWebRequest request = WebRequest.Create("http://localhost:3000/alarm/turn_off/" + this.id) as HttpWebRequest;
-            request.Method = "POST";
-            request.ContentType = "application/x-www-form-urlencoded";
-            request.ContentLength = byteArray.Length;
-            Stream dataStream = request.GetRequestStream();
-            dataStream.Write(byteArray, 0, byteArray.Length);
-            dataStream.Close();
-            request.BeginGetResponse(delegate(IAsyncResult result) {
-                WebResponse response = request.EndGetResponse(result);
-                response.Close();
-            }, null);
         }
     }
 }

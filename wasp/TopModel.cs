@@ -8,8 +8,6 @@ using System.Xml.XPath;
 using Schedule;
 using System.Globalization;
 using System.Collections.Generic;
-using System.Net;
-using System.IO;
 
 namespace Wasp {
     class TopModel {
@@ -25,8 +23,6 @@ namespace Wasp {
         private List<AlarmModel> alarms;
         public List<AlarmModel> Alarms { get { return this.alarms; } }
 
-        private DateTime scheduleLastModified;
-
         private bool pinned;
         public bool Pinned {
             get { return this.pinned; }
@@ -39,18 +35,14 @@ namespace Wasp {
         private String time;
         public String Time { get { return this.time; } }
 
-        List<AlarmModel> alarmsToFireAsap;
+        private List<AlarmModel> alarmsToFireAsap;
 
-        public void ReadyForAlarms() {
-            this.scheduleTimer.Start();
-            foreach (AlarmModel alarm in this.alarmsToFireAsap)
-                alarm.Fire();
-            this.alarmsToFireAsap.Clear();
-        }
+        private ScheduleService service;
 
         public TopModel() {
             this.time = DateTime.Now.ToLongTimeString();
-            this.alarmsToFireAsap = null;
+            this.alarmsToFireAsap = new List<AlarmModel>();
+            this.service = new ScheduleService();
         }
 
         public void InitTimer() {
@@ -67,6 +59,13 @@ namespace Wasp {
             scheduleRetriever.Start();
         }
 
+        public void ReadyForAlarms() {
+            this.scheduleTimer.Start();
+            foreach (AlarmModel alarm in this.alarmsToFireAsap)
+                alarm.Fire();
+            this.alarmsToFireAsap.Clear();
+        }
+
         private void FireAlarm(AlarmModel alarm) {
             alarm.Fire();
         }
@@ -77,52 +76,19 @@ namespace Wasp {
         }
 
         private void TimeToCheckSchedule(Object sender, EventArgs args) {
-            HttpWebRequest request = WebRequest.Create("http://localhost:3000/schedule.xml") as HttpWebRequest;
-            request.IfModifiedSince = this.scheduleLastModified;
-            request.BeginGetResponse(delegate(IAsyncResult result) {
-                WebResponse response = null;
-                try {
-                    response = request.EndGetResponse(result);
-                    string xml = new StreamReader(response.GetResponseStream()).ReadToEnd();
-                    this.scheduleLastModified = DateTime.Parse(response.Headers.Get("Last-Modified"));
-                    this.InstallSchedule(xml);
-                }
-                catch (WebException e) {
-                    HttpWebResponse response2 = e.Response as HttpWebResponse;
-                    if (response2.StatusCode != HttpStatusCode.NotModified)
-                        throw e;
-                }
-                finally {
-                    if (response != null)
-                        response.Close();
-                }
-            }, null);
+            this.service.CheckForNewAlarms(InstallNewAlarms);
         }
 
-        private void InstallSchedule(String scheduleXml) {
+        public void InstallNewAlarms(List<AlarmModel> newAlarms) {
             this.alarms = new List<AlarmModel>();
             this.scheduleTimer.Stop();
             this.scheduleTimer.ClearJobs();
 
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(scheduleXml);
-
-            this.alarmsToFireAsap = new List<AlarmModel>();
-            foreach (XmlNode alarmNode in doc.SelectSingleNode("schedule").ChildNodes) {
-                String alarmWhenString = alarmNode.Attributes.GetNamedItem("datetime").Value;
-                DateTime alarmWhen = DateTime.ParseExact(alarmWhenString, "yyyy-MM-dd HH:mm:ss",
-                    CultureInfo.InvariantCulture);
-                Console.WriteLine("when: {0}", alarmWhen);
-
-                String id = alarmNode.Attributes.GetNamedItem("id").Value;
-                String name = alarmNode.Attributes.GetNamedItem("name").Value;
-                bool isArmed = alarmNode.Attributes.GetNamedItem("armed").Value.Equals("true");
-                AlarmModel alarm = new AlarmModel(id, name, alarmWhen, isArmed);
-
+            foreach (AlarmModel alarm in newAlarms) {
                 this.alarms.Add(alarm);
                 if (alarm.IsArmed) {
                     if (alarm.When > DateTime.Now)
-                        this.scheduleTimer.AddJob(new TimerJob(new SingleEvent(alarmWhen),
+                        this.scheduleTimer.AddJob(new TimerJob(new SingleEvent(alarm.When),
                             new DelegateMethodCall(new OneArgDelegate(FireAlarm), alarm)));
                     else
                         this.alarmsToFireAsap.Add(alarm);
