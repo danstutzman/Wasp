@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
@@ -67,10 +66,10 @@ namespace Wasp {
 
                 this.alarmControllers = new List<AlarmController>();
                 List<AlarmModel> todaysAlarms = new List<AlarmModel>();
-                todaysAlarms.AddRange(this.model.Alarms.Where(delegate(AlarmModel alarm) {
+                foreach (AlarmModel model in this.model.Alarms)
                     // Can't arm an alarm if we have nothing listening to it
-                    return true; // alarm.when.Date == DateTime.Now.Date;
-                }));
+                    if (true) //(alarm.when.Date == DateTime.Now.Date)
+                        todaysAlarms.Add(model);
                 for (int i = 0; i < todaysAlarms.Count; i++) {
                     AlarmModel alarm = todaysAlarms[i];
                     AlarmView control = new AlarmView();
