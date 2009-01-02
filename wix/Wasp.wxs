@@ -18,7 +18,7 @@
         <Directory Id='Acme' Name='Acme'>
           <Directory Id='INSTALLDIR' Name='Foobar10' LongName='Foobar 1.0'>
             <Component Id='MainExecutable'
-                Guid='d2db8aa1-bc85-4ea6-8ae3-3050be636258'>
+                Guid='D2DB8AA1-BC85-4EA6-8AE3-3050BE636258'>
               <File Id='FoobarEXE' Name='Wasp.exe'
                   LongName='Wasp.exe' DiskId='1'
 		  Source='../wasp/bin/release/Wasp.exe' Vital='yes'>
@@ -32,6 +32,12 @@
                   Icon="Foobar10.exe" IconIndex="0" />
               </File>
             </Component>
+            <Component Id='Log4NetLibrary' Guid='4DD8AF10-D920-11DD-AD8B-0800200C9A66'>
+	      <File Id='Log4NetDll' Name='log4net.dll' DiskId='1' Source='../wasp/bin/release/log4net.dll' Vital='yes' />
+            </Component>
+            <Component Id='Log4NetConfiguration' Guid='54053070-D920-11DD-AD8B-0800200C9A66'>
+	      <File Id='Log4NetConfig' Name='log4net.con' LongName='log4net.config' DiskId='1' Source='../wasp/bin/release/log4net.config' Vital='yes' />
+            </Component>
         </Directory>
       </Directory>
     </Directory>
@@ -43,6 +49,8 @@
 
     <Feature Id='Complete' Level='1'>
       <ComponentRef Id='MainExecutable' />
+      <ComponentRef Id='Log4NetLibrary' />
+      <ComponentRef Id='Log4NetConfiguration' />
     </Feature>
 
     <Icon Id="Foobar10.exe" SourceFile="../wasp/bin/release/Wasp.exe" />

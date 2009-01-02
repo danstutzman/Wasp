@@ -8,6 +8,9 @@ using System.Globalization;
 
 namespace Wasp {
     class ScheduleService {
+        private static readonly log4net.ILog log =
+            log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public delegate void InstallNewAlarms(List<AlarmModel> newAlarms);
 
         private DateTime scheduleLastModified;
@@ -23,8 +26,9 @@ namespace Wasp {
                 try {
                     response = request.EndGetResponse(result);
                     string xml = new StreamReader(response.GetResponseStream()).ReadToEnd();
+                    log.Debug(xml);
                     String lastModifiedString = response.Headers.Get("Last-Modified");
-                    Console.WriteLine("Last-Modified: " + lastModifiedString);
+                    log.Debug("Last-Modified: " + lastModifiedString);
 
                     XmlDocument doc = new XmlDocument();
                     doc.LoadXml(xml);
@@ -37,7 +41,6 @@ namespace Wasp {
                         String alarmWhenString = alarmNode.Attributes.GetNamedItem("datetime").Value;
                         DateTime alarmWhen = DateTime.ParseExact(alarmWhenString, "yyyy-MM-dd HH:mm:ss",
                             CultureInfo.InvariantCulture);
-                        //Console.WriteLine("when: {0}", alarmWhen);
 
                         String id = alarmNode.Attributes.GetNamedItem("id").Value;
                         String name = alarmNode.Attributes.GetNamedItem("name").Value;
@@ -53,7 +56,9 @@ namespace Wasp {
                 }
                 catch (WebException e) {
                     HttpWebResponse response2 = e.Response as HttpWebResponse;
-                    if (response2.StatusCode != HttpStatusCode.NotModified)
+                    if (response2.StatusCode == HttpStatusCode.NotModified)
+                        log.Debug("Got 304");
+                    else
                         throw e;
                 }
                 finally {

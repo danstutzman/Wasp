@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
 
+[assembly: log4net.Config.XmlConfigurator(Watch = true, ConfigFile = "log4net.config")]
+
 namespace Wasp {
     class Program {
         [STAThread]
