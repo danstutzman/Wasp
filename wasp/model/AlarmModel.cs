@@ -38,6 +38,7 @@ namespace Wasp {
 
         public void TurnOff() {
             this.isFiring = false;
+            this.isArmed = false;
             FiringChange(this, new EventArgs());
         }
     }

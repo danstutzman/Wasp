@@ -52,12 +52,20 @@ class AlarmController < ApplicationController
     redirect_to :action => 'list'
   end
 
+  def service_update
+    alarm = Alarm.find(params['id'])
+    alarm.armed = (params['armed'] == 'true')
+    alarm.save!
+    write_to_xml
+    render :text => "OK"
+  end
+
   private
   def write_to_xml
     File.open('public/schedule2.xml', 'w') { |file|
       file.write "<schedule>\n"
       Alarm.find(:all, :order => 'id').each { |alarm|
-        file.write "  <alarm name='#{alarm.name}' datetime='#{DateTime.parse(alarm.datetime).strftime('%Y-%m-%d %H:%M:%S')}'/>\n"
+        file.write "  <alarm id='#{alarm.id}' name='#{alarm.name}' armed='#{alarm.armed?}' datetime='#{DateTime.parse(alarm.datetime).strftime('%Y-%m-%d %H:%M:%S')}'/>\n"
       }
       file.write "</schedule>\n"
     }

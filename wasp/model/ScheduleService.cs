@@ -17,14 +17,19 @@ namespace Wasp {
         }
 
         public void CheckForNewAlarms(InstallNewAlarms installer) {
-            HttpWebRequest request = WebRequest.Create("http://localhost:3000/schedule.xml") as HttpWebRequest;
+            HttpWebRequest request = WebRequest.Create("http://dstutzman.vail.lan.flt/schedule_xml.php") as HttpWebRequest;
             request.IfModifiedSince = this.scheduleLastModified;
             request.BeginGetResponse(delegate(IAsyncResult result) {
                 WebResponse response = null;
                 try {
                     response = request.EndGetResponse(result);
                     string xml = new StreamReader(response.GetResponseStream()).ReadToEnd();
-                    this.scheduleLastModified = DateTime.Parse(response.Headers.Get("Last-Modified"));
+                    String lastModifiedString = response.Headers.Get("Last-Modified");
+                    if (lastModifiedString == null) {
+                        Console.WriteLine(response.Headers);
+                        throw new Exception("Last-Modified is null");
+                    }
+                    this.scheduleLastModified = DateTime.Parse(lastModifiedString);
 
                     XmlDocument doc = new XmlDocument();
                     doc.LoadXml(xml);
@@ -64,8 +69,9 @@ namespace Wasp {
             AlarmModel alarm = (sender as AlarmModel);
 
             string postData = "firing=" + alarm.IsFiring + "&armed=" + alarm.IsArmed;
+            Console.WriteLine("posting post data: {0}", postData);
             byte[] postDataBytes = Encoding.UTF8.GetBytes(postData);
-            HttpWebRequest request = WebRequest.Create("http://localhost:3000/alarm/service_update/" + alarm.Id) as HttpWebRequest;
+            HttpWebRequest request = WebRequest.Create("http://dstutzman.vail.lan.flt/alarm_service_update.php?id=" + alarm.Id) as HttpWebRequest;
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
             request.ContentLength = postDataBytes.Length;
@@ -74,6 +80,7 @@ namespace Wasp {
             dataStream.Close();
             request.BeginGetResponse(delegate(IAsyncResult result) {
                 WebResponse response = request.EndGetResponse(result);
+                this.scheduleLastModified = DateTime.Parse(response.Headers.Get("Last-Modified"));
                 response.Close();
             }, null);
 
