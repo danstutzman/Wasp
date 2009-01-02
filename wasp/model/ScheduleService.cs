@@ -24,17 +24,16 @@ namespace Wasp {
                     response = request.EndGetResponse(result);
                     string xml = new StreamReader(response.GetResponseStream()).ReadToEnd();
                     String lastModifiedString = response.Headers.Get("Last-Modified");
-                    if (lastModifiedString == null) {
-                        Console.WriteLine(response.Headers);
-                        throw new Exception("Last-Modified is null");
-                    }
-                    this.scheduleLastModified = DateTime.Parse(lastModifiedString);
+                    Console.WriteLine("Last-Modified: " + lastModifiedString);
 
                     XmlDocument doc = new XmlDocument();
                     doc.LoadXml(xml);
 
                     List<AlarmModel> newAlarms = new List<AlarmModel>();
-                    foreach (XmlNode alarmNode in doc.SelectSingleNode("schedule").ChildNodes) {
+                    XmlNode scheduleNode = doc.SelectSingleNode("schedule");
+                    lastModifiedString = scheduleNode.Attributes.GetNamedItem("lastModified").Value;
+                    this.scheduleLastModified = DateTime.Parse(lastModifiedString);
+                    foreach (XmlNode alarmNode in scheduleNode.ChildNodes) {
                         String alarmWhenString = alarmNode.Attributes.GetNamedItem("datetime").Value;
                         DateTime alarmWhen = DateTime.ParseExact(alarmWhenString, "yyyy-MM-dd HH:mm:ss",
                             CultureInfo.InvariantCulture);

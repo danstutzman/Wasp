@@ -27,8 +27,8 @@ mysql_free_result($result);
     }
 ?>
 
-<schedule>
 <?php
+echo "<schedule lastModified='" . $last_modified . "'>\n";
 $query = sprintf("select * from alarms;");
 // WHERE firstname='%s' AND lastname='%s'", mysql_real_escape_string($firstname), mysql_real_escape_string($lastname));
 $result = mysql_query($query);
@@ -45,6 +45,5 @@ while ($row = mysql_fetch_assoc($result)) {
 // This is done automatically at the end of the script
 mysql_free_result($result);
 mysql_close($link);
-
+echo "</schedule>\n";
 ?>
-</schedule> 
